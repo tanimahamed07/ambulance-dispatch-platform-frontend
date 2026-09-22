@@ -1,6 +1,7 @@
 import AmbulanceTypes from "@/components/home/AmbulanceTypes";
 import BecomeDriver from "@/components/home/BecomeDriver";
 import FeaturesGrid from "@/components/home/FeaturesGrid";
+import FirstAidTips from "@/components/home/FirstAidTips";
 import HeroSection from "@/components/home/HeroSection";
 import HowItWorks from "@/components/home/HowItWorks";
 import PaymentPricing from "@/components/home/PaymentPricing";
@@ -22,6 +23,7 @@ export default function HomePage() {
       <TripLifecycle></TripLifecycle>
       <PaymentPricing></PaymentPricing>
       <SafetyTrust></SafetyTrust>
+      <FirstAidTips></FirstAidTips>
     </div>
   );
 }
