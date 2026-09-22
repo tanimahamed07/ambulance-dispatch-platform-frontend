@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Ambulance, Menu, X, Phone } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 
 const LINKS = [
   { href: "/services", label: "Services" },
@@ -54,27 +55,42 @@ export default function Navbar() {
 
           <span className="h-4 w-px bg-border" />
 
-          {/* Base UI style rendering */}
-          <Button variant="ghost" size="sm" render={<Link href="/login" />}>
+          {/* Dark/Light Theme Toggle */}
+          <ThemeToggle />
+
+          <span className="h-4 w-px bg-border" />
+
+          <Button
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/login" />}
+          >
             Log in
           </Button>
 
-          <Button size="sm" render={<Link href="/register" />}>
+          <Button
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/register" />}
+          >
             Sign up
           </Button>
         </div>
 
-        {/* Mobile Menu Toggle Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setOpen((v) => !v)}
-          className="lg:hidden"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        {/* Mobile Actions & Menu Toggle Button */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Drawer Navigation */}
@@ -107,12 +123,14 @@ export default function Navbar() {
             <Button
               variant="outline"
               className="w-full"
+              nativeButton={false}
               render={<Link href="/login" onClick={() => setOpen(false)} />}
             >
               Log in
             </Button>
             <Button
               className="w-full"
+              nativeButton={false}
               render={<Link href="/register" onClick={() => setOpen(false)} />}
             >
               Sign up
