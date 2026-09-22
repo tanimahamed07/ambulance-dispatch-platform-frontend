@@ -1,6 +1,9 @@
+// components/home/HeroSection.tsx
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Ambulance, MapPin, ShieldCheck } from "lucide-react";
 
@@ -9,6 +12,16 @@ const STEPS = [
   { label: "Ambulance assigned", tone: "text-foreground" },
   { label: "Driver en route", tone: "text-destructive" },
 ] as const;
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
 
 export default function HeroSection() {
   const [elapsed, setElapsed] = useState(0);
@@ -33,37 +46,65 @@ export default function HeroSection() {
     <section className="bg-background text-foreground">
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:py-16">
         {/* Left: Message */}
-        <div className="flex flex-col justify-center">
-          <div className="mb-4 flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="flex flex-col justify-center"
+        >
+          <motion.div
+            variants={item}
+            className="mb-4 flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider"
+          >
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive/60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
             </span>
             Live dispatch across Dhaka
-          </div>
+          </motion.div>
 
-          <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+          <motion.h1
+            variants={item}
+            className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl"
+          >
             An ambulance,
             <br />
             dispatched in minutes.
-          </h1>
+          </motion.h1>
 
-          <p className="mt-4 max-w-md text-base text-muted-foreground">
+          <motion.p
+            variants={item}
+            className="mt-4 max-w-md text-base text-muted-foreground"
+          >
             Request an ambulance, get matched with the nearest verified driver,
             and track every step to the hospital — all from one call.
-          </p>
+          </motion.p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button size="default" variant="destructive" className="gap-2">
+          <motion.div variants={item} className="mt-6 flex flex-wrap gap-3">
+            <Button
+              size="default"
+              variant="destructive"
+              className="gap-2"
+              nativeButton={false}
+              render={<Link href="/caller/request-emergency" />}
+            >
               <Ambulance className="h-4 w-4" />
               Request an ambulance
             </Button>
-            <Button size="default" variant="outline">
+            <Button
+              size="default"
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/become-a-driver" />}
+            >
               Become a driver
             </Button>
-          </div>
+          </motion.div>
 
-          <div className="mt-8 grid grid-cols-3 gap-6 border-t border-border pt-5">
+          <motion.div
+            variants={item}
+            className="mt-8 grid grid-cols-3 gap-6 border-t border-border pt-5"
+          >
             <div>
               <div className="font-mono text-xl font-bold">8 min</div>
               <div className="text-xs text-muted-foreground">
@@ -82,11 +123,16 @@ export default function HeroSection() {
                 partner hospitals
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Right: Live Dispatch Ticket */}
-        <div className="flex items-center justify-center lg:justify-end">
+        <motion.div
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+          className="flex items-center justify-center lg:justify-end"
+        >
           <div className="w-full max-w-sm rounded-xl border border-border bg-card text-card-foreground shadow-sm">
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <span className="font-mono text-xs font-medium text-muted-foreground">
@@ -141,7 +187,7 @@ export default function HeroSection() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

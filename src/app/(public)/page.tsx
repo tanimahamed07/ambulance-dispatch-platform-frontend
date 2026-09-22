@@ -1,3 +1,4 @@
+import AmbulanceTypes from "@/components/home/AmbulanceTypes";
 import HeroSection from "@/components/home/HeroSection";
 import HowItWorks from "@/components/home/HowItWorks";
 import QuickEmergencyStrip from "@/components/home/QuickEmergencyStrip";
@@ -10,6 +11,7 @@ export default function HomePage() {
       <QuickEmergencyStrip></QuickEmergencyStrip>
       <StatsCounters></StatsCounters>
       <HowItWorks></HowItWorks>
+      <AmbulanceTypes></AmbulanceTypes>
     </div>
   );
 }

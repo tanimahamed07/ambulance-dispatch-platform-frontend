@@ -13,14 +13,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const EMERGENCY_TYPES = ["BASIC", "ICU", "FREEZER", "CCU"] as const;
+// AmbulanceType Enum অনুযায়ী টাইপ লিস্ট
+const AMBULANCE_TYPES = [
+  { value: "AC", label: "AC Ambulance" },
+  { value: "NON_AC", label: "Non-AC Ambulance" },
+  { value: "ICU", label: "ICU Ambulance" },
+  { value: "FREEZER", label: "Freezer Ambulance" },
+  { value: "AIR", label: "Air Ambulance" },
+] as const;
+
+export type AmbulanceType = (typeof AMBULANCE_TYPES)[number]["value"];
 
 export default function QuickEmergencyStrip() {
   const router = useRouter();
 
   const [pickupAddress, setPickupAddress] = useState("");
   const [patientPhone, setPatientPhone] = useState("");
-  const [emergencyType, setEmergencyType] = useState<string>("BASIC");
+  const [ambulanceType, setAmbulanceType] = useState<AmbulanceType>("AC");
 
   function handleDummyLocation() {
     setPickupAddress("Dhanmondi 27, Dhaka (Current Location)");
@@ -32,7 +41,7 @@ export default function QuickEmergencyStrip() {
     const params = new URLSearchParams({
       pickupAddress: pickupAddress || "Dhanmondi, Dhaka",
       patientPhone: patientPhone || "01700000000",
-      emergencyType: emergencyType,
+      ambulanceType: ambulanceType,
     });
 
     const targetUrl = `/caller/request-emergency?${params.toString()}`;
@@ -78,16 +87,19 @@ export default function QuickEmergencyStrip() {
           />
         </div>
 
-        {/* Emergency Type Selection */}
+        {/* Ambulance Type Selection */}
         <div className="w-full sm:w-60">
-          <Select value={emergencyType} onValueChange={setEmergencyType}>
+          <Select
+            value={ambulanceType}
+            onValueChange={(val) => setAmbulanceType(val as AmbulanceType)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
             <SelectContent>
-              {EMERGENCY_TYPES.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type} Ambulance
+              {AMBULANCE_TYPES.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
                 </SelectItem>
               ))}
             </SelectContent>
