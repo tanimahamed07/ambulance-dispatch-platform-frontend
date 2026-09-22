@@ -5,6 +5,7 @@ import HeroSection from "@/components/home/HeroSection";
 import HowItWorks from "@/components/home/HowItWorks";
 import PaymentPricing from "@/components/home/PaymentPricing";
 import QuickEmergencyStrip from "@/components/home/QuickEmergencyStrip";
+import SafetyTrust from "@/components/home/SafetyTrust";
 import StatsCounters from "@/components/home/StatsCounters";
 import TripLifecycle from "@/components/home/TripLifecycle";
 
@@ -20,6 +21,7 @@ export default function HomePage() {
       <BecomeDriver></BecomeDriver>
       <TripLifecycle></TripLifecycle>
       <PaymentPricing></PaymentPricing>
+      <SafetyTrust></SafetyTrust>
     </div>
   );
 }
