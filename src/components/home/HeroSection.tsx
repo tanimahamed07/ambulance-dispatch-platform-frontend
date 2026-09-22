@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Ambulance, MapPin, ShieldCheck } from "lucide-react";
 
 const STEPS = [
-  { label: "Request received", tone: "text-[#151A1E]/50" },
-  { label: "Ambulance assigned", tone: "text-[#151A1E]" },
-  { label: "Driver en route", tone: "text-[#D8272C]" },
+  { label: "Request received", tone: "text-muted-foreground" },
+  { label: "Ambulance assigned", tone: "text-foreground" },
+  { label: "Driver en route", tone: "text-destructive" },
 ] as const;
 
 export default function HeroSection() {
@@ -30,112 +30,109 @@ export default function HeroSection() {
   const ss = String(elapsed % 60).padStart(2, "0");
 
   return (
-    <section className="bg-[#F5F6F4] text-[#151A1E]">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:py-28">
-        {/* Left: message */}
+    <section className="bg-background text-foreground">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:py-16">
+        {/* Left: Message */}
         <div className="flex flex-col justify-center">
-          <div className="mb-6 flex items-center gap-2 text-sm text-[#151A1E]/60">
+          <div className="mb-4 flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D8272C]/60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#D8272C]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive/60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
             </span>
             Live dispatch across Dhaka
           </div>
 
-          <h1 className="font-[Archivo_Condensed,'Barlow_Condensed',sans-serif] text-[3.25rem] font-bold leading-[0.95] tracking-tight sm:text-[4.25rem]">
+          <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
             An ambulance,
             <br />
             dispatched in minutes.
           </h1>
 
-          <p className="mt-6 max-w-md text-lg text-[#151A1E]/70">
+          <p className="mt-4 max-w-md text-base text-muted-foreground">
             Request an ambulance, get matched with the nearest verified driver,
             and track every step to the hospital — all from one call.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button className="h-12 rounded-md bg-[#D8272C] px-6 text-base font-medium hover:bg-[#7A1418]">
-              <Ambulance className="mr-2 h-5 w-5" />
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button size="default" variant="destructive" className="gap-2">
+              <Ambulance className="h-4 w-4" />
               Request an ambulance
             </Button>
-            <Button
-              variant="outline"
-              className="h-12 rounded-md border-[#151A1E]/20 px-6 text-base font-medium hover:bg-[#151A1E]/5"
-            >
+            <Button size="default" variant="outline">
               Become a driver
             </Button>
           </div>
 
-          <div className="mt-14 grid grid-cols-3 gap-6 border-t border-[#151A1E]/10 pt-6">
+          <div className="mt-8 grid grid-cols-3 gap-6 border-t border-border pt-5">
             <div>
-              <div className="font-[IBM_Plex_Mono,monospace] text-2xl font-semibold">
-                8 min
-              </div>
-              <div className="text-sm text-[#151A1E]/55">
+              <div className="font-mono text-xl font-bold">8 min</div>
+              <div className="text-xs text-muted-foreground">
                 avg. response time
               </div>
             </div>
             <div>
-              <div className="font-[IBM_Plex_Mono,monospace] text-2xl font-semibold">
-                500+
+              <div className="font-mono text-xl font-bold">500+</div>
+              <div className="text-xs text-muted-foreground">
+                verified drivers
               </div>
-              <div className="text-sm text-[#151A1E]/55">verified drivers</div>
             </div>
             <div>
-              <div className="font-[IBM_Plex_Mono,monospace] text-2xl font-semibold">
-                40+
+              <div className="font-mono text-xl font-bold">40+</div>
+              <div className="text-xs text-muted-foreground">
+                partner hospitals
               </div>
-              <div className="text-sm text-[#151A1E]/55">partner hospitals</div>
             </div>
           </div>
         </div>
 
-        {/* Right: live dispatch ticket */}
+        {/* Right: Live Dispatch Ticket */}
         <div className="flex items-center justify-center lg:justify-end">
-          <div className="w-full max-w-sm rounded-lg border border-[#151A1E]/10 bg-white shadow-[0_1px_0_rgba(0,0,0,0.04)]">
-            <div className="flex items-center justify-between border-b border-[#151A1E]/10 px-5 py-4">
-              <span className="font-[IBM_Plex_Mono,monospace] text-sm text-[#151A1E]/60">
+          <div className="w-full max-w-sm rounded-xl border border-border bg-card text-card-foreground shadow-sm">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <span className="font-mono text-xs font-medium text-muted-foreground">
                 CALL #DA-2291
               </span>
-              <span className="font-[IBM_Plex_Mono,monospace] text-sm font-medium">
+              <span className="font-mono text-sm font-semibold">
                 {mm}:{ss}
               </span>
             </div>
 
-            <div className="space-y-4 px-5 py-5">
+            <div className="space-y-3 px-4 py-4">
               <div className="flex items-start gap-3">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#151A1E]/40" />
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                 <div>
                   <div className="text-sm font-medium">Mirpur-10, Dhaka</div>
-                  <div className="text-xs text-[#151A1E]/50">
+                  <div className="text-xs text-muted-foreground">
                     Pickup location
                   </div>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#151A1E]/40" />
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                 <div>
                   <div className="text-sm font-medium">
                     Ambulance BA-1187 · ICU
                   </div>
-                  <div className="text-xs text-[#151A1E]/50">
+                  <div className="text-xs text-muted-foreground">
                     Driver: Rafiqul Islam
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-1 border-t border-border/50">
                 {STEPS.map((s, i) => (
                   <div
                     key={s.label}
-                    className={`flex items-center gap-2 py-1.5 text-sm transition-colors ${
-                      i === step ? s.tone : "text-[#151A1E]/30"
-                    } ${i === step ? "font-medium" : ""}`}
+                    className={`flex items-center gap-2 py-1 text-xs transition-colors ${
+                      i === step
+                        ? `${s.tone} font-medium`
+                        : "text-muted-foreground/40"
+                    }`}
                   >
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${
-                        i === step ? "bg-current" : "bg-[#151A1E]/20"
+                        i === step ? "bg-current" : "bg-muted-foreground/30"
                       }`}
                     />
                     {s.label}
