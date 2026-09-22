@@ -2,12 +2,14 @@ import AmbulanceTypes from "@/components/home/AmbulanceTypes";
 import BecomeDriver from "@/components/home/BecomeDriver";
 import FeaturesGrid from "@/components/home/FeaturesGrid";
 import FirstAidTips from "@/components/home/FirstAidTips";
+import Footer from "@/components/home/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import HowItWorks from "@/components/home/HowItWorks";
 import PaymentPricing from "@/components/home/PaymentPricing";
 import QuickEmergencyStrip from "@/components/home/QuickEmergencyStrip";
 import SafetyTrust from "@/components/home/SafetyTrust";
 import StatsCounters from "@/components/home/StatsCounters";
+import Testimonials from "@/components/home/Testimonials";
 import TripLifecycle from "@/components/home/TripLifecycle";
 
 export default function HomePage() {
@@ -24,6 +26,8 @@ export default function HomePage() {
       <PaymentPricing></PaymentPricing>
       <SafetyTrust></SafetyTrust>
       <FirstAidTips></FirstAidTips>
+      <Testimonials></Testimonials>
+      <Footer></Footer>
     </div>
   );
 }
