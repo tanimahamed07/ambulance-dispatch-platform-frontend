@@ -7,10 +7,7 @@ import { Ambulance, Menu, X, Phone } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 const LINKS = [
-  { href: "/services", label: "Services" },
-  { href: "/how-it-works", label: "How it works" },
   { href: "/hospitals", label: "Hospitals" },
-  { href: "/become-a-driver", label: "Become a driver" },
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
 ];

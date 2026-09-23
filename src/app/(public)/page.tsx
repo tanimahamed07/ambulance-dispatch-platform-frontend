@@ -1,6 +1,7 @@
 import AmbulanceTypes from "@/components/home/AmbulanceTypes";
 import BecomeDriver from "@/components/home/BecomeDriver";
 import FeaturesGrid from "@/components/home/FeaturesGrid";
+import FinalCta from "@/components/home/FinalCta";
 import FirstAidTips from "@/components/home/FirstAidTips";
 import Footer from "@/components/home/Footer";
 import HeroSection from "@/components/home/HeroSection";
@@ -27,6 +28,7 @@ export default function HomePage() {
       <SafetyTrust></SafetyTrust>
       <FirstAidTips></FirstAidTips>
       <Testimonials></Testimonials>
+      <FinalCta></FinalCta>
       <Footer></Footer>
     </div>
   );

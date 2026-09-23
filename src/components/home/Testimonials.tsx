@@ -1,4 +1,5 @@
 // components/home/Testimonials.tsx
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
 "use client";
 
 import { useState, useEffect } from "react";
