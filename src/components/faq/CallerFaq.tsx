@@ -72,7 +72,7 @@ export default function CallerFaq() {
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
         >
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion className="w-full">
             {FAQS.map(({ question, answer }, i) => (
               <motion.div key={question} variants={item}>
                 <AccordionItem value={`caller-${i}`}>

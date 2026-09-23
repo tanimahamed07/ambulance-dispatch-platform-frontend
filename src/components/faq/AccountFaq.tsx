@@ -39,7 +39,11 @@ const container: Variants = {
 
 const item: Variants = {
   hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4 },
+  },
 };
 
 export default function AccountFaq() {
@@ -62,7 +66,7 @@ export default function AccountFaq() {
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
         >
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion className="w-full">
             {FAQS.map(({ question, answer }, i) => (
               <motion.div key={question} variants={item}>
                 <AccordionItem value={`account-${i}`}>

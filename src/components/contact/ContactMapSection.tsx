@@ -54,18 +54,19 @@ export default function ContactMapSection() {
               <Button
                 variant="outline"
                 size="sm"
-                asChild
                 className="w-full sm:w-auto"
-              >
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${MAP_QUERY}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Navigation className="mr-2 h-4 w-4" />
-                  Open in Maps
-                </a>
-              </Button>
+                render={(props) => (
+                  <a
+                    {...props}
+                    href={`https://www.google.com/maps/search/?api=1&query=${MAP_QUERY}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Navigation className="mr-2 h-4 w-4" />
+                    Open in Maps
+                  </a>
+                )}
+              />
             </CardHeader>
 
             <CardContent className="p-0">
