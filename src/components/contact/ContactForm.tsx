@@ -1,23 +1,19 @@
-// components/contact/ContactForm.tsx
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Send, CheckCircle2, RotateCcw } from "lucide-react";
+import { Mail, Send } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
 
 const SUBJECTS = [
   { value: "general", label: "General inquiry" },
@@ -26,219 +22,129 @@ const SUBJECTS = [
   { value: "report_issue", label: "Report an issue" },
 ] as const;
 
-const contactSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Enter a valid email address"),
-  subject: z.enum(
-    ["general", "partnership", "driver_support", "report_issue"],
-    {
-      errorMap: () => ({ message: "Please choose a subject" }),
-    },
-  ),
-  message: z.string().min(10, "Message should be at least 10 characters"),
-});
-
-type ContactValues = z.infer<typeof contactSchema>;
-
-const SUPPORT_EMAIL = "support@rescue.app";
+type SubjectValue = (typeof SUBJECTS)[number]["value"];
 
 export default function ContactForm() {
-  const [sent, setSent] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState<SubjectValue>("general");
+  const [message, setMessage] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<ContactValues>({
-    resolver: zodResolver(contactSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      subject: "general",
-      message: "",
-    },
-  });
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-  const subject = watch("subject");
+    // Handle form submission here
 
-  function onSubmit(values: ContactValues) {
-    const subjectLabel =
-      SUBJECTS.find((s) => s.value === values.subject)?.label ??
-      "General inquiry";
-
-    const mailtoUrl = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
-      `[${subjectLabel}] from${values.name}`,
-    )}&body=${encodeURIComponent(`${values.message}\n\n— ${values.name} (${values.email})`)}`;
-
-    window.location.href = mailtoUrl;
-    setSent(true);
-  }
-
-  function handleReset() {
-    reset();
-    setSent(false);
-  }
-
-  if (sent) {
-    return (
-      <Card className="border-border bg-card text-card-foreground shadow-sm">
-        <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-            <CheckCircle2 className="h-6 w-6" />
-          </div>
-
-          <div className="space-y-1">
-            <h3 className="text-xl font-bold tracking-tight text-foreground">
-              Opening your email client...
-            </h3>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              If it didn't open automatically, you can email us directly at{" "}
-              <a
-                href={`mailto:${SUPPORT_EMAIL}`}
-                className="font-medium text-destructive underline hover:opacity-90"
-              >
-                {SUPPORT_EMAIL}
-              </a>
-              .
-            </p>
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="mt-2 gap-2"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            Send another message
-          </Button>
-        </CardContent>
-      </Card>
-    );
+    setName("");
+    setEmail("");
+    setSubject("general");
+    setMessage("");
   }
 
   return (
-    <Card className="border-border bg-card text-card-foreground shadow-sm">
-      <CardContent className="pt-6">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-5"
-          noValidate
-        >
-          {/* Name & Email Fields */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="name"
-                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-              >
-                Name
-              </Label>
-              <Input
-                id="name"
-                {...register("name")}
-                placeholder="Your name"
-                className="bg-background"
-              />
-              {errors.name && (
-                <p className="text-xs font-medium text-destructive">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
+    <section className="border-y bg-background">
+      <form
+        onSubmit={handleSubmit}
+        className="mx-auto max-w-6xl space-y-5 p-4 sm:px-6"
+      >
+        {/* Intro */}
+        <div className="flex items-start gap-3">
+          <Mail className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
 
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="email"
-                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-              >
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                {...register("email")}
-                placeholder="you@example.com"
-                className="bg-background"
-              />
-              {errors.email && (
-                <p className="text-xs font-medium text-destructive">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
+          <div>
+            <h2 className="text-sm font-medium">Send us a message</h2>
+
+            <p className="mt-1 text-xs text-muted-foreground">
+              Have a question? Send us a message and our team will get back to
+              you.
+            </p>
           </div>
+        </div>
 
-          {/* Subject Field */}
+        {/* Name + Email */}
+        <div className="grid grid-cols-1 gap-3 border-t pt-5 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label
-              htmlFor="subject"
-              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-            >
-              Subject
+            <Label htmlFor="name" className="text-xs text-muted-foreground">
+              Name
             </Label>
-            <Select
-              value={subject}
-              onValueChange={(v) =>
-                setValue("subject", v as ContactValues["subject"], {
-                  shouldValidate: true,
-                })
-              }
-            >
-              <SelectTrigger id="subject" className="bg-background">
-                <SelectValue placeholder="Choose a subject" />
-              </SelectTrigger>
-              <SelectContent>
-                {SUBJECTS.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>
-                    {s.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.subject && (
-              <p className="text-xs font-medium text-destructive">
-                {errors.subject.message}
-              </p>
-            )}
-          </div>
 
-          {/* Message Field */}
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="message"
-              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-            >
-              Message
-            </Label>
-            <Textarea
-              id="message"
-              {...register("message")}
-              rows={5}
-              placeholder="How can we help?"
-              className="resize-none bg-background"
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              className="bg-background"
             />
-            {errors.message && (
-              <p className="text-xs font-medium text-destructive">
-                {errors.message.message}
-              </p>
-            )}
           </div>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full gap-2 sm:w-auto"
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-xs text-muted-foreground">
+              Email
+            </Label>
+
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="bg-background"
+            />
+          </div>
+        </div>
+
+        {/* Subject */}
+        <div className="space-y-1.5">
+          <Label htmlFor="subject" className="text-xs text-muted-foreground">
+            Subject
+          </Label>
+
+          <Select
+            value={subject}
+            onValueChange={(value) => setSubject(value as SubjectValue)}
           >
-            <Send className="h-4 w-4" />
+            <SelectTrigger id="subject" className="bg-background">
+              <SelectValue placeholder="Choose a subject" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {SUBJECTS.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Message */}
+        <div className="space-y-1.5">
+          <Label htmlFor="message" className="text-xs text-muted-foreground">
+            Message
+          </Label>
+
+          <Textarea
+            id="message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={5}
+            placeholder="How can we help?"
+            className="resize-none bg-background"
+          />
+        </div>
+
+        {/* Footer */}
+        <div className="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-xs text-muted-foreground">
+            We&apos;ll get back to you as soon as possible.
+          </span>
+
+          <Button type="submit" className="w-full shrink-0 sm:w-auto">
+            <Send className="mr-2 h-4 w-4" />
             Send message
           </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+      </form>
+    </section>
   );
 }
