@@ -29,7 +29,6 @@ export default function HomePage() {
       <FirstAidTips></FirstAidTips>
       <Testimonials></Testimonials>
       <FinalCta></FinalCta>
-      <Footer></Footer>
     </div>
   );
 }

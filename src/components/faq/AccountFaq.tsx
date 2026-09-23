@@ -1,4 +1,4 @@
-// components/faq/PaymentFaq.tsx
+// components/faq/AccountFaq.tsx
 "use client";
 
 import { motion, Variants } from "framer-motion";
@@ -11,24 +11,24 @@ import {
 
 const FAQS = [
   {
-    question: "How do I pay after a trip?",
+    question: "Is my location data shared with anyone besides the driver?",
     answer:
-      "Once your driver marks the trip complete, a \"Pay now\" option appears on your trip page. Tapping it redirects you to bKash, where you approve the payment with your PIN, and you're brought back once it's confirmed.",
+      "Your pickup location is shared with the dispatcher who assigns your request and the driver handling your trip. It isn't shared with any other user, and stops being tracked once your trip ends.",
   },
   {
-    question: "What if my payment fails?",
+    question: "How are drivers verified?",
     answer:
-      "If a bKash payment doesn't go through, you can retry it directly from the same trip page — there's no need to start a new request or contact support first.",
+      "Every driver submits their NID, driving license, and vehicle documents when applying. An admin reviews these manually and only approves the application — allowing the driver to be assigned an ambulance and go on duty — once everything checks out.",
   },
   {
-    question: "Is the fare shown before or after the trip?",
+    question: "Is my personal information secure?",
     answer:
-      "The exact fare is only calculated after the trip is completed, since it depends on the real distance covered. You can estimate it beforehand using the fare calculator on the pricing page, but the final amount is set once the driver logs the trip's distance.",
+      "Yes. Access to your account requires authentication, passwords are never stored in plain text, and all requests to the platform go through validated, role-restricted endpoints — so only people who need your data (like your assigned driver or dispatcher) can see it.",
   },
   {
-    question: "Do I get a receipt?",
+    question: "How do I delete my account / data?",
     answer:
-      "Yes. Once payment is confirmed, the record is saved against your trip and you can view the payment details — amount, distance, and status — anytime from your trip history.",
+      "Reach out through the contact page with your account details and we'll process the deletion request. Trip and payment records tied to completed emergencies may be retained briefly for support and billing purposes before full removal.",
   },
 ];
 
@@ -42,9 +42,9 @@ const item: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
-export default function PaymentFaq() {
+export default function AccountFaq() {
   return (
-    <section id="payments" className="bg-background py-16 scroll-mt-20">
+    <section id="account" className="bg-background py-16 scroll-mt-20">
       <div className="mx-auto max-w-4xl px-6">
         <motion.h2
           initial={{ opacity: 0, y: 12 }}
@@ -53,7 +53,7 @@ export default function PaymentFaq() {
           transition={{ duration: 0.4 }}
           className="mb-8 text-2xl font-bold tracking-tight text-foreground"
         >
-          Payments
+          Account & Safety
         </motion.h2>
 
         <motion.div
@@ -65,7 +65,7 @@ export default function PaymentFaq() {
           <Accordion type="single" collapsible className="w-full">
             {FAQS.map(({ question, answer }, i) => (
               <motion.div key={question} variants={item}>
-                <AccordionItem value={`payment-${i}`}>
+                <AccordionItem value={`account-${i}`}>
                   <AccordionTrigger className="text-left text-sm font-medium text-foreground">
                     {question}
                   </AccordionTrigger>

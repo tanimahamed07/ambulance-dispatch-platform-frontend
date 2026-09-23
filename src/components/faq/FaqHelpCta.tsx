@@ -1,38 +1,24 @@
-// components/home/FinalCta.tsx
+// components/faq/FaqHelpCta.tsx
 "use client";
 
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
-import { Ambulance, Phone } from "lucide-react";
+import { MessageCircleQuestion, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const container: Variants = {
   hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
+  show: { transition: { staggerChildren: 0.1 } },
 };
 
 const item: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 16,
-  },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut",
-    },
-  },
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-export default function FinalCta() {
+export default function FaqHelpCta() {
   return (
-    <section className="bg-background py-16 scroll-mt-20">
+    <section id="still-need-help" className="bg-background py-16 scroll-mt-20">
       <div className="mx-auto max-w-6xl px-6">
         <motion.div
           variants={container}
@@ -41,46 +27,39 @@ export default function FinalCta() {
           viewport={{ once: true, margin: "-100px" }}
           className="flex flex-col items-center gap-4 rounded-lg border border-destructive/30 bg-destructive/5 px-6 py-10 text-center"
         >
-          {/* Icon */}
           <motion.div
             variants={item}
             className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10"
           >
-            <Ambulance className="h-6 w-6 text-destructive" />
+            <MessageCircleQuestion className="h-6 w-6 text-destructive" />
           </motion.div>
 
-          {/* Heading */}
           <motion.h2
             variants={item}
-            className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+            className="text-2xl font-bold tracking-tight text-foreground"
           >
-            Need an ambulance right now?
+            Didn't find your answer?
           </motion.h2>
 
-          {/* Description */}
           <motion.p
             variants={item}
-            className="max-w-lg text-sm text-muted-foreground"
+            className="max-w-sm text-sm text-muted-foreground"
           >
-            Every second matters in an emergency. Request an ambulance through
-            our dispatch system, or call 999 directly for immediate assistance.
+            Our support team is reachable directly — reach out through the
+            contact page, or call or email us right away.
           </motion.p>
 
-          {/* Actions */}
           <motion.div
             variants={item}
             className="mt-2 flex flex-wrap justify-center gap-3"
           >
             <Button
               variant="destructive"
-              className="gap-2"
               nativeButton={false}
-              render={<Link href="/caller/request-emergency" />}
+              render={<Link href="/contact" />}
             >
-              <Ambulance className="h-4 w-4" />
-              Request an ambulance
+              Contact us
             </Button>
-
             <Button
               variant="outline"
               className="gap-2"
@@ -88,17 +67,18 @@ export default function FinalCta() {
               render={<a href="tel:999" />}
             >
               <Phone className="h-4 w-4" />
-              Call 999
+              999
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              nativeButton={false}
+              render={<a href="mailto:support@rescue.app" />}
+            >
+              <Mail className="h-4 w-4" />
+              Email
             </Button>
           </motion.div>
-
-          {/* Supporting text */}
-          <motion.p
-            variants={item}
-            className="mt-3 text-xs text-muted-foreground"
-          >
-            Available 24/7 for emergency response.
-          </motion.p>
         </motion.div>
       </div>
     </section>

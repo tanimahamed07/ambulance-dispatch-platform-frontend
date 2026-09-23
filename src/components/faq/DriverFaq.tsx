@@ -55,7 +55,7 @@ const item: Variants = {
 export default function DriverFaq() {
   return (
     <section id="drivers" className="bg-background py-16 scroll-mt-20">
-      <div className="mx-auto max-w-3xl px-6">
+      <div className="mx-auto max-w-4xl px-6">
         <motion.h2
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}

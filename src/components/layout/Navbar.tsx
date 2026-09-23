@@ -7,9 +7,10 @@ import { Ambulance, Menu, X, Phone } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 const LINKS = [
-  { href: "/hospitals", label: "Hospitals" },
+  { href: "/", label: "Home" },
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
+  { href: "/about", label: "About" },
 ];
 
 export default function Navbar() {
