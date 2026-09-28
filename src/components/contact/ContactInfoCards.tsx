@@ -89,7 +89,10 @@ export default function ContactInfoCards() {
           {CONTACT_INFO.map(
             ({ icon: Icon, label, value, description, href }) => {
               const cardContent = (
-                <Card className="h-full transition-colors hover:border-destructive/40">
+                <Card
+                  key={label}
+                  className="h-full transition-colors hover:border-destructive/40"
+                >
                   <CardHeader>
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-destructive/10">
                       <Icon className="h-5 w-5 text-destructive" />
