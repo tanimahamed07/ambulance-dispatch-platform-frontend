@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Ambulance, Menu, X, Phone } from "lucide-react";
+import { Ambulance, Menu, X, Phone, LogOut } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetMe, useLogout } from "@/hooks";
+import { toast } from "../ui/toast";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -15,6 +19,35 @@ const LINKS = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const { data, isLoading } = useGetMe();
+  const { mutate: logout } = useLogout();
+  const queryClient = useQueryClient();
+
+  const isLoggedIn = !!data && !isLoading;
+
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: () => {
+        toast.add({
+          title: "Logged out",
+          description: "Logged out successfully",
+          type: "success",
+        });
+
+        queryClient.removeQueries({ queryKey: ["user"] });
+        setOpen(false);
+      },
+      onError: () => {
+        toast.add({
+          title: "Logout failed",
+          description: "Something went wrong",
+          type: "error",
+        });
+      },
+    });
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,15 +63,23 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 lg:flex">
-          {LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {LINKS.map((link) => {
+            const isActive = pathname === link.href;
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-medium transition-colors ${
+                  isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Desktop Actions */}
@@ -53,36 +94,51 @@ export default function Navbar() {
 
           <span className="h-4 w-px bg-border" />
 
-          {/* Dark/Light Theme Toggle */}
           <ThemeToggle />
 
           <span className="h-4 w-px bg-border" />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            nativeButton={false}
-            render={<Link href="/login" />}
-          >
-            Log in
-          </Button>
+          {!isLoading &&
+            (isLoggedIn ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link href="/login" />}
+                >
+                  Log in
+                </Button>
 
-          <Button
-            size="sm"
-            nativeButton={false}
-            render={<Link href="/register" />}
-          >
-            Sign up
-          </Button>
+                <Button
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link href="/register" />}
+                >
+                  Sign up
+                </Button>
+              </>
+            ))}
         </div>
 
-        {/* Mobile Actions & Menu Toggle Button */}
+        {/* Mobile Actions */}
         <div className="flex items-center gap-2 lg:hidden">
           <ThemeToggle />
+
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setOpen((value) => !value)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >
@@ -95,16 +151,24 @@ export default function Navbar() {
       {open && (
         <div className="border-b border-border bg-background px-6 py-4 lg:hidden">
           <nav className="flex flex-col gap-1">
-            {LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {LINKS.map((link) => {
+              const isActive = pathname === link.href;
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="mt-4 border-t border-border pt-4">
@@ -117,23 +181,43 @@ export default function Navbar() {
             </a>
           </div>
 
-          <div className="mt-4 flex gap-3">
-            <Button
-              variant="outline"
-              className="w-full"
-              nativeButton={false}
-              render={<Link href="/login" onClick={() => setOpen(false)} />}
-            >
-              Log in
-            </Button>
-            <Button
-              className="w-full"
-              nativeButton={false}
-              render={<Link href="/register" onClick={() => setOpen(false)} />}
-            >
-              Sign up
-            </Button>
-          </div>
+          {!isLoading && (
+            <div className="mt-4 flex gap-3">
+              {isLoggedIn ? (
+                <Button
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    nativeButton={false}
+                    render={
+                      <Link href="/login" onClick={() => setOpen(false)} />
+                    }
+                  >
+                    Log in
+                  </Button>
+
+                  <Button
+                    className="w-full"
+                    nativeButton={false}
+                    render={
+                      <Link href="/register" onClick={() => setOpen(false)} />
+                    }
+                  >
+                    Sign up
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </header>

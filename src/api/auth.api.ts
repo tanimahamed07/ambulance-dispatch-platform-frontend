@@ -33,3 +33,11 @@ export function forgotPassword(payload: forgotPasswordPayload) {
 export function resetPassword(payload: resetPasswordPayload) {
   return apiClient("/auth/reset-password", { method: "POST", body: payload });
 }
+
+export function getMe() {
+  return apiClient("/auth/me");
+}
+
+export function userLogout() {
+  return apiClient("/auth/logout", { method: "POST" });
+}

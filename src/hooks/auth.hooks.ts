@@ -1,12 +1,14 @@
 import {
   callerRegistration,
   forgotPassword,
+  getMe,
   resendVerificationCode,
   resetPassword,
   userLogin,
+  userLogout,
   verifyAccount,
 } from "@/api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function useRegistration() {
   return useMutation({
@@ -38,5 +40,19 @@ export function useForgotPassword() {
 export function useResetPassword() {
   return useMutation({
     mutationFn: resetPassword,
+  });
+}
+
+export function useGetMe() {
+  return useQuery({
+    queryKey: ["user"],
+    queryFn: getMe,
+    retry: false,
+  });
+}
+
+export function useLogout() {
+  return useMutation({
+    mutationFn: userLogout,
   });
 }
