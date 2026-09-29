@@ -1,3 +1,5 @@
+import { string } from "zod";
+
 export interface CallerRegistrationPayload {
   name: string;
   email: string;
@@ -7,8 +9,22 @@ export interface CallerRegistrationPayload {
   };
 }
 
-
 export interface VerifyAccountPayload {
-  email: string,
-  otp: string,
+  email: string;
+  otp: string;
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface forgotPasswordPayload {
+  email: string;
+}
+
+export interface resetPasswordPayload {
+  email: string;
+  otp: string;
+  newPassword: string;
 }

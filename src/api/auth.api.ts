@@ -1,5 +1,11 @@
 import apiClient from "@/lib/apiClient";
-import { CallerRegistrationPayload, VerifyAccountPayload } from "@/types";
+import {
+  CallerRegistrationPayload,
+  forgotPasswordPayload,
+  LoginPayload,
+  resetPasswordPayload,
+  VerifyAccountPayload,
+} from "@/types";
 
 export function callerRegistration(payload: CallerRegistrationPayload) {
   return apiClient("/auth/register", { method: "POST", body: payload });
@@ -14,4 +20,16 @@ export function resendVerificationCode(payload: VerifyAccountPayload) {
     method: "POST",
     body: payload,
   });
+}
+
+export function userLogin(payload: LoginPayload) {
+  return apiClient("/auth/login", { method: "POST", body: payload });
+}
+
+export function forgotPassword(payload: forgotPasswordPayload) {
+  return apiClient("/auth/forgot-password", { method: "POST", body: payload });
+}
+
+export function resetPassword(payload: resetPasswordPayload) {
+  return apiClient("/auth/reset-password", { method: "POST", body: payload });
 }
