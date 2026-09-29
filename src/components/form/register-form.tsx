@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { callerRegistrationSchema } from "@/validation";
 import { useRegistration } from "@/hooks";
 import { toast } from "../ui/toast";
+import { getErrorMessage } from "@/lib/get-error-message";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -47,28 +48,22 @@ export default function RegisterForm() {
 
       registration(registrationData, {
         onSuccess: (res) => {
-          if (!res.success) {
+          if (res) {
             toast.add({
-              title: "Server Failure",
-              description: "Something went wrong. Please try again",
-              type: "error",
+              title: "Registration Successful",
+              description: "Please verify your account",
+              type: "success",
             });
-            return;
+            const params = new URLSearchParams({
+              email: registrationData.email,
+            });
+            router.push(`/register/account-verify?${params.toString()}`);
           }
-
-          toast.add({
-            title: "Registration Successful",
-            description: "Please verify your account",
-            type: "success",
-          });
-          const params = new URLSearchParams({ email: registrationData.email });
-          router.push(`/register/account-verify?${params.toString()}`);
         },
         onError: (err) => {
           toast.add({
-            title: "Authorization failure",
-            description:
-              err.message || "Something went wrong. Please try again",
+            title: "Registration Failed",
+            description: getErrorMessage(err),
             type: "error",
           });
         },
