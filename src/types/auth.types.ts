@@ -1,5 +1,3 @@
-import { string } from "zod";
-
 export interface CallerRegistrationPayload {
   name: string;
   email: string;

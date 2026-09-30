@@ -1,57 +1,38 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
+import { Ambulance, LogOut, Phone, Siren, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  Ambulance,
-  CreditCard,
-  LayoutDashboard,
-  LifeBuoy,
-  LogOut,
-  Navigation,
-  Phone,
-  Radar,
-  Settings,
-  Siren,
-  Users,
-  X,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "@/components/ui/toast";
+import { useLogout } from "@/hooks";
+import { cn } from "@/lib/utils";
+import type { SidebarItem, SidebarItems } from "@/types";
 
-const MAIN_NAV = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/dispatch", label: "Dispatch Board", icon: Radar },
-  { href: "/dashboard/trips", label: "Active Trips", icon: Navigation },
-  { href: "/dashboard/fleet", label: "Fleet", icon: Ambulance },
-  { href: "/dashboard/drivers", label: "Drivers", icon: Users },
-  { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
-];
-
-const SYSTEM_NAV = [
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
-  { href: "/dashboard/support", label: "Help & Support", icon: LifeBuoy },
-];
-
-function isActive(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
+function isActive(pathname: string, href: string, exact?: boolean) {
+  if (pathname === href) {
+    return true;
+  }
+  if (exact) {
+    return false;
+  }
+  return pathname.startsWith(`${href}/`);
 }
 
 function NavItem({
   href,
   label,
   icon: Icon,
+  exact,
   pathname,
   onNavigate,
-}: {
-  href: string;
-  label: string;
-  icon: typeof LayoutDashboard;
+}: SidebarItem & {
   pathname: string;
   onNavigate?: () => void;
 }) {
-  const active = isActive(pathname, href);
+  const active = isActive(pathname, href, exact);
 
   return (
     <Link
@@ -79,13 +60,41 @@ function NavItem({
 }
 
 export function DashboardSidebar({
+  routes,
   open,
   onClose,
 }: {
+  routes: SidebarItems;
   open: boolean;
   onClose: () => void;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
+
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: () => {
+        toast.add({
+          title: "Logged out",
+          description: "Logged out successfully",
+          type: "success",
+        });
+
+        queryClient.removeQueries({ queryKey: ["user"] });
+        onClose();
+        router.replace("/login");
+      },
+      onError: () => {
+        toast.add({
+          title: "Logout failed",
+          description: "Something went wrong",
+          type: "error",
+        });
+      },
+    });
+  };
 
   const content = (
     <>
@@ -114,34 +123,18 @@ export function DashboardSidebar({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
-        <div className="space-y-1">
-          <p className="px-3 pb-1 text-[0.65rem] font-semibold uppercase tracking-widest text-sidebar-foreground/40">
-            Main
-          </p>
-          {MAIN_NAV.map((item) => (
-            <NavItem
-              key={item.href}
-              {...item}
-              pathname={pathname}
-              onNavigate={onClose}
-            />
-          ))}
-        </div>
-
-        <div className="space-y-1">
-          <p className="px-3 pb-1 text-[0.65rem] font-semibold uppercase tracking-widest text-sidebar-foreground/40">
-            System
-          </p>
-          {SYSTEM_NAV.map((item) => (
-            <NavItem
-              key={item.href}
-              {...item}
-              pathname={pathname}
-              onNavigate={onClose}
-            />
-          ))}
-        </div>
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        <p className="px-3 pb-1 text-[0.65rem] font-semibold uppercase tracking-widest text-sidebar-foreground/40">
+          Menu
+        </p>
+        {routes.map((item) => (
+          <NavItem
+            key={item.href}
+            {...item}
+            pathname={pathname}
+            onNavigate={onClose}
+          />
+        ))}
       </nav>
 
       {/* Emergency + footer */}
@@ -167,6 +160,8 @@ export function DashboardSidebar({
             variant="ghost"
             size="icon-sm"
             aria-label="Log out"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
             className="text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
           >
             <LogOut className="size-4" />

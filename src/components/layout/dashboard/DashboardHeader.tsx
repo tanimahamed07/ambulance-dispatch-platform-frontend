@@ -1,14 +1,45 @@
 "use client";
 
-import Link from "next/link";
 import { Bell, ChevronDown, Menu, Plus, Search } from "lucide-react";
+import Link from "next/link";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import type { AuthUser, UserRole } from "@/types";
 
-export function DashboardHeader({ onMenuClick }: { onMenuClick: () => void }) {
+const ROLE_LABELS: Record<UserRole, string> = {
+  ADMIN: "Administrator",
+  DISPATCHER: "Dispatcher",
+  DRIVER: "Driver",
+  CALLER: "Caller",
+};
+
+function getInitials(name?: string) {
+  if (!name) {
+    return "?";
+  }
+
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+export function DashboardHeader({
+  user,
+  profileHref,
+  onMenuClick,
+}: {
+  user?: AuthUser;
+  profileHref: string;
+  onMenuClick: () => void;
+}) {
+  const roleLabel = user ? ROLE_LABELS[user.role] : undefined;
+
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">
       {/* Mobile menu trigger */}
@@ -56,20 +87,20 @@ export function DashboardHeader({ onMenuClick }: { onMenuClick: () => void }) {
 
         {/* Profile */}
         <Link
-          href="/dashboard/settings"
+          href={profileHref}
           className="flex items-center gap-2 rounded-lg px-1.5 py-1 transition-colors hover:bg-accent"
         >
           <Avatar className="size-8">
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-              TM
+            <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+              {getInitials(user?.name)}
             </AvatarFallback>
           </Avatar>
           <span className="hidden flex-col leading-tight md:flex">
             <span className="text-sm font-medium text-foreground">
-              Tanim Ahamed
+              {user?.name ?? "Signed in"}
             </span>
             <span className="text-xs text-muted-foreground">
-              Control Room · Admin
+              {roleLabel ?? "—"}
             </span>
           </span>
           <ChevronDown className="hidden size-4 text-muted-foreground md:block" />

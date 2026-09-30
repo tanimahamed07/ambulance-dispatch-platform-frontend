@@ -1,21 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import type { ReactNode } from "react";
-import { DashboardSidebar } from "./DashboardSidebar";
+import { useState } from "react";
+import { useGetMe } from "@/hooks";
+import { getRoutesForRole } from "@/routes";
 import { DashboardHeader } from "./DashboardHeader";
+import { DashboardSidebar } from "./DashboardSidebar";
 
 export function DashboardShell({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { data } = useGetMe();
+
+  const user = data?.data;
+  const routes = getRoutesForRole(user?.role);
 
   return (
     <div className="min-h-screen bg-muted/40">
       <DashboardSidebar
+        routes={routes}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
       <div className="flex min-h-screen flex-col lg:pl-64">
-        <DashboardHeader onMenuClick={() => setSidebarOpen(true)} />
+        <DashboardHeader
+          user={user}
+          profileHref={routes[0]?.href ?? "/"}
+          onMenuClick={() => setSidebarOpen(true)}
+        />
         <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-6 lg:p-8">
           {children}
         </main>

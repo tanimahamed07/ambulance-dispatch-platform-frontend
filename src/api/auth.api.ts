@@ -1,5 +1,6 @@
 import apiClient from "@/lib/apiClient";
-import {
+import type {
+  AuthUser,
   CallerRegistrationPayload,
   forgotPasswordPayload,
   LoginPayload,
@@ -35,7 +36,7 @@ export function resetPassword(payload: resetPasswordPayload) {
 }
 
 export function getMe() {
-  return apiClient("/auth/me");
+  return apiClient<{ data: AuthUser }>("/auth/me");
 }
 
 export function userLogout() {

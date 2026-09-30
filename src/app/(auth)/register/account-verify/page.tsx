@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import {
   Ambulance,
   ArrowLeft,
@@ -8,12 +9,6 @@ import {
 } from "lucide-react";
 
 import VerifyAccountForm from "@/components/form/verify-account-form";
-
-type VerifyEmailPageProps = {
-  searchParams: Promise<{
-    email?: string;
-  }>;
-};
 
 export default async function VerifyEmailPage() {
   return (
@@ -129,7 +124,8 @@ export default async function VerifyEmailPage() {
                 </p>
               </div>
 
-              <VerifyAccountForm />
+
+                <VerifyAccountForm />
 
               <div className="mt-6 flex justify-center">
                 <Link
