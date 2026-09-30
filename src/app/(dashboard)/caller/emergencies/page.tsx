@@ -1,3 +1,3 @@
-export default function emergenciesPage() {
-  return <div>RequestAmbulancePage</div>;
+export default function MyEmergencyRequestPage() {
+  return <div>myEmergencyRequest</div>;
 }
