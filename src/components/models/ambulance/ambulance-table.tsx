@@ -34,13 +34,13 @@ export default function AmbulanceTable({
 }: {
   ambulances: Ambulance[];
 }) {
-  const [selectedAmbulance, setSelectedAmbulance] = useState<Ambulance | null>(
+  const [selectedAmbulanceId, setSelectedAmbulanceId] = useState<string | null>(
     null,
   );
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  const handleViewDetails = (ambulance: Ambulance) => {
-    setSelectedAmbulance(ambulance);
+  const handleViewDetails = (ambulanceId: string) => {
+    setSelectedAmbulanceId(ambulanceId);
     setIsDetailsModalOpen(true);
   };
 
@@ -118,7 +118,7 @@ export default function AmbulanceTable({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleViewDetails(ambulance)}
+                  onClick={() => handleViewDetails(ambulance.id)}
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   Details
@@ -130,13 +130,11 @@ export default function AmbulanceTable({
       </Table>
 
       {/* Ambulance Details Modal */}
-      {selectedAmbulance && (
-        <AmbulanceDetailsModal
-          ambulance={selectedAmbulance}
-          isOpen={isDetailsModalOpen}
-          onOpenChange={setIsDetailsModalOpen}
-        />
-      )}
+      <AmbulanceDetailsModal
+        ambulanceId={selectedAmbulanceId}
+        isOpen={isDetailsModalOpen}
+        onOpenChange={setIsDetailsModalOpen}
+      />
     </div>
   );
 }

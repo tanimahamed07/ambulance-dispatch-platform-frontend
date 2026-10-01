@@ -43,6 +43,7 @@ export interface DriverQueryParams {
   limit?: number;
   searchTerm?: string;
   assignable?: string;
+  hasAmbulance?: string;
   email?: string;
   licenseNumber?: string;
   isAvailable?: string | boolean;
@@ -70,4 +71,8 @@ export interface ApproveDriverPayload {
   approvalStatus: DriverApprovalStatus;
   rejectionReason?: RejectionReason;
   rejectionNote?: string;
+}
+
+export interface AssignDriverToAmbulancePayload {
+  driverId: string;
 }

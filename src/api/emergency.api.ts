@@ -29,3 +29,5 @@ export function getEmergenciesRequest(params?: EmergencyQueryParams) {
 export function getEmergencyDetails(id: string) {
   return apiClient<ApiResponse<EmergencyDetails>>(`/emergency/${id}`);
 }
+
+

@@ -62,3 +62,13 @@ export function updateDriverApplicationStatus(payload: ApproveDriverPayload) {
     body: payload,
   });
 }
+
+export function assignDriverToAmbulance(
+  ambulanceId: string,
+  payload: { driverId: string },
+) {
+  return apiClient(`/ambulance/${ambulanceId}/assign-driver`, {
+    method: "PATCH",
+    body: payload,
+  });
+}

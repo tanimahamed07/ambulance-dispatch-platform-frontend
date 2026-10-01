@@ -6,6 +6,7 @@ import {
   getAllDriverApplication,
   getDriverDetails,
   updateDriverApplicationStatus,
+  assignDriverToAmbulance,
 } from "@/api/driver.api";
 import type {
   DriverQueryParams,
@@ -13,6 +14,7 @@ import type {
   ApproveDriverPayload,
 } from "@/types/driver.type";
 import { toast } from "@/components/ui/toast";
+import { assignDriverWithAmbulance } from "@/api/ambulance.api";
 
 export function useGetAllDrivers(params?: DriverQueryParams) {
   return useQuery({
@@ -98,6 +100,24 @@ export function useDriverApplicationStatusUpdate() {
         description:
           error?.message || "Failed to update driver application status",
       });
+    },
+  });
+}
+
+export function useAssignDriverWithAmbulance() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: { driverId: string };
+    }) => assignDriverWithAmbulance(id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ambulances"] });
     },
   });
 }
