@@ -15,9 +15,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Emergency, EmergencyType } from "@/types/emergency.type";
-import EmergencyPriorityBadge from "./emergency-priority-badge";
-import EmergencyStatusBadge from "./emergency-status-badge";
-import { CallerEmergencyModal } from "./caller-emergency-modal";
+import EmergencyPriorityBadge from "../emergencies/emergency-priority-badge";
+import EmergencyStatusBadge from "../emergencies/emergency-status-badge";
+import { DispatcherEmergencyModal } from "./dispatcher-emergency-modal";
 
 const EMERGENCY_TYPE_LABELS: Record<
   EmergencyType,
@@ -43,16 +43,11 @@ function EmptyState() {
   );
 }
 
-export default function EmergenciesTable({
+export default function DispatcherEmergenciesTable({
   emergencies,
 }: {
   emergencies: Emergency[];
-  basePath?: string;
 }) {
-  const [selectedEmergency, setSelectedEmergency] = useState<Emergency | null>(
-    null,
-  );
-
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -160,7 +155,7 @@ export default function EmergenciesTable({
       </div>
 
       {/* Emergency Detail Modal */}
-      <CallerEmergencyModal
+      <DispatcherEmergencyModal
         emergencyId={selectedId}
         isOpen={isOpen}
         onOpenChange={setIsOpen}

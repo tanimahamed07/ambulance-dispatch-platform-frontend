@@ -1,18 +1,22 @@
 import {
   Ambulance,
-  CreditCard,
+  AlertCircle,
   LayoutDashboard,
-  LifeBuoy,
-  Navigation,
-  Radar,
+  Route,
+  Settings,
 } from "lucide-react";
 import type { SidebarItems } from "@/types";
 
+const prefix = "/dispatcher";
+
 export const dispatcherRoutes: SidebarItems = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/dispatch", label: "Dispatch Board", icon: Radar },
-  { href: "/dashboard/trips", label: "Active Trips", icon: Navigation },
-  { href: "/dashboard/fleet", label: "Fleet", icon: Ambulance },
-  { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
-  { href: "/dashboard/support", label: "Help & Support", icon: LifeBuoy },
+  { href: prefix, label: "Overview", icon: LayoutDashboard, exact: true },
+  {
+    href: `${prefix}/emergencies`,
+    label: "Emergencies",
+    icon: AlertCircle,
+  },
+  { href: `${prefix}/trips`, label: "Trips", icon: Route },
+  { href: `${prefix}/fleet`, label: "Fleet", icon: Ambulance },
+  { href: `${prefix}/settings`, label: "Settings", icon: Settings },
 ];

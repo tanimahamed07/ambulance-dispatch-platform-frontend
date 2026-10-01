@@ -2,6 +2,7 @@ import apiClient from "@/lib/apiClient";
 import { ApiResponse, PaginatedResponse } from "@/types/api.type";
 import {
   Emergency,
+  EmergencyDetails,
   EmergencyPayload,
   EmergencyQueryParams,
 } from "@/types/emergency.type";
@@ -17,4 +18,14 @@ export function getMyEmergencies(params?: EmergencyQueryParams) {
       params,
     },
   );
+}
+
+export function getEmergenciesRequest(params?: EmergencyQueryParams) {
+  return apiClient<ApiResponse<PaginatedResponse<Emergency>>>("/emergency", {
+    params,
+  });
+}
+
+export function getEmergencyDetails(id: string) {
+  return apiClient<ApiResponse<EmergencyDetails>>(`/emergency/${id}`);
 }

@@ -17,9 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import TablePagination from "@/components/ui/table-pagination";
-import EmergenciesTable from "@/components/models/emergencies/emergencies-table";
+import DispatcherEmergenciesTable from "@/components/models/request/dispatcher-emergencies-table";
 
-import { useGetMyEmergencies } from "@/hooks/emergency.hooks";
+import { useGetEmergenciesRequest } from "@/hooks/emergency.hooks";
 import useDebounce from "@/hooks/debounce.hook";
 import type {
   EmergencyQueryParams,
@@ -38,7 +38,7 @@ const STATUS_TABS: { value: EmergencyStatus | "ALL"; label: string }[] = [
   { value: "CANCELLED", label: "Cancelled" },
 ];
 
-export default function MyEmergenciesPage() {
+export default function EmergenciesRequestPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<EmergencyStatus | "ALL">("ALL");
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,7 +49,7 @@ export default function MyEmergenciesPage() {
   if (status !== "ALL") params.status = status;
   if (debouncedSearchTerm) params.searchTerm = debouncedSearchTerm;
 
-  const { data: response, isLoading, error } = useGetMyEmergencies(params);
+  const { data: response, isLoading, error } = useGetEmergenciesRequest(params);
 
   const emergencies = response?.data?.data ?? [];
   const meta = response?.data?.meta;
@@ -109,7 +109,7 @@ export default function MyEmergenciesPage() {
             onValueChange={handleStatusChange}
             className="w-full"
           >
-            <TabsList className="grid h-auto w-full max-w-4xl grid-cols-7">
+            <TabsList className="grid w-full grid-cols-6 max-w-3xl">
               {STATUS_TABS.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value}>
                   {tab.label.replace(" Status", "")}
@@ -151,7 +151,7 @@ export default function MyEmergenciesPage() {
 
       {!isLoading && !error && (
         <>
-          <EmergenciesTable basePath="my-emergencies/" emergencies={emergencies} />
+          <DispatcherEmergenciesTable emergencies={emergencies} />
 
           {meta && meta.totalPages > 0 && (
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
