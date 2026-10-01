@@ -7,16 +7,22 @@ import {
   Radar,
   Settings,
   Users,
+  UserCheck,
 } from "lucide-react";
 import type { SidebarItems } from "@/types";
 
 export const adminRoutes: SidebarItems = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/dispatch", label: "Dispatch Board", icon: Radar },
-  { href: "/dashboard/trips", label: "Active Trips", icon: Navigation },
-  { href: "/dashboard/fleet", label: "Fleet", icon: Ambulance },
-  { href: "/dashboard/drivers", label: "Drivers", icon: Users },
-  { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
-  { href: "/dashboard/support", label: "Help & Support", icon: LifeBuoy },
+  { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
+  {
+    href: "/admin/driver-application",
+    label: "Driver Applications",
+    icon: UserCheck,
+  },
+  { href: "/admin/dispatch", label: "Dispatch Board", icon: Radar },
+  { href: "/admin/trips", label: "Active Trips", icon: Navigation },
+  { href: "/admin/fleet", label: "Fleet", icon: Ambulance },
+  { href: "/admin/drivers", label: "Drivers", icon: Users },
+  { href: "/admin/payments", label: "Payments", icon: CreditCard },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/support", label: "Help & Support", icon: LifeBuoy },
 ];

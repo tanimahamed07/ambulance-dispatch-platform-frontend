@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAllDrivers, assignDriver, applyDriver } from "@/api/driver.api";
+import {
+  getAllDrivers,
+  assignDriver,
+  applyDriver,
+  getAllDriverApplication,
+  getDriverDetails,
+} from "@/api/driver.api";
 import type {
   DriverQueryParams,
   AssignDriverPayload,
@@ -44,5 +50,20 @@ export function useAssignDriver(emergencyId: string) {
 export function useApplyDriver() {
   return useMutation({
     mutationFn: applyDriver,
+  });
+}
+
+export function useGetAllDriverApplication(params?: DriverQueryParams) {
+  return useQuery({
+    queryKey: ["driver-applications", params],
+    queryFn: () => getAllDriverApplication(params),
+  });
+}
+
+export function useGetDriverDetails(id: string | null, enabled = true) {
+  return useQuery({
+    queryKey: ["driver-details", id],
+    queryFn: () => getDriverDetails(id as string),
+    enabled: !!id && enabled,
   });
 }
