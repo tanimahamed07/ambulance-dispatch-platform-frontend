@@ -1,5 +1,6 @@
 import {
   AlertCircle,
+  Car,
   LayoutDashboard,
   PhoneCall,
   Settings,
@@ -19,6 +20,11 @@ export const callerRoutes: SidebarItems = [
     href: `${prefix}/my-emergencies`,
     label: "My Emergencies",
     icon: PhoneCall,
+  },
+  {
+    href: `${prefix}/apply-driver`,
+    label: "Apply as Driver",
+    icon: Car,
   },
   { href: `${prefix}/settings`, label: "Settings", icon: Settings },
 ];

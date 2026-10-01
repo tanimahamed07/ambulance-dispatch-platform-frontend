@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 import { CheckCircle2, Circle, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +19,7 @@ import type { EmergencyTrip } from "@/types/emergency.type";
 import EmergencyPriorityBadge from "../emergencies/emergency-priority-badge";
 import EmergencyStatusBadge from "../emergencies/emergency-status-badge";
 import { useGetEmergencyDetails } from "@/hooks";
+import { AssignDriverModal } from "./assign-driver-modal";
 
 interface DispatcherEmergencyModalProps {
   emergencyId: string | null;
@@ -84,6 +87,8 @@ export function DispatcherEmergencyModal({
   isOpen,
   onOpenChange,
 }: DispatcherEmergencyModalProps) {
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+
   const { data, isLoading, isError, error } = useGetEmergencyDetails(
     emergencyId,
     isOpen,
@@ -92,6 +97,8 @@ export function DispatcherEmergencyModal({
   const emergency = data?.data;
   const dispatch = emergency?.dispatch ?? null;
   const trip = dispatch?.trips ?? null;
+
+  const canAssignDriver = emergency?.status === "PENDING" && !dispatch;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -202,9 +209,19 @@ export function DispatcherEmergencyModal({
                   <Row label="Accepted" value={fmt(dispatch.acceptedAt)} />
                 </>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  No ambulance assigned yet.
-                </p>
+                <>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    No ambulance assigned yet.
+                  </p>
+                  {canAssignDriver && (
+                    <Button
+                      onClick={() => setIsAssignModalOpen(true)}
+                      className="w-full"
+                    >
+                      Assign Driver
+                    </Button>
+                  )}
+                </>
               )}
             </Section>
 
@@ -234,6 +251,15 @@ export function DispatcherEmergencyModal({
           </div>
         )}
       </DialogContent>
+
+      {/* Assign Driver Modal */}
+      {emergencyId && (
+        <AssignDriverModal
+          emergencyId={emergencyId}
+          isOpen={isAssignModalOpen}
+          onOpenChange={setIsAssignModalOpen}
+        />
+      )}
     </Dialog>
   );
 }
