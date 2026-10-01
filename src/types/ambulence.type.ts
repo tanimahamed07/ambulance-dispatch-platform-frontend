@@ -1,10 +1,11 @@
-export type AmbulanceType = "AC" | "NON_AC" | "ICU";
+export type AmbulanceType = "AC" | "NON_AC" | "ICU" | "FREEZER" | "AIR";
 
 export type AmbulanceStatus =
   | "AVAILABLE"
   | "ASSIGNED"
   | "EN_ROUTE"
   | "OFFLINE"
+  | "ON_TRIP"
   | "MAINTENANCE";
 
 export interface Driver {
@@ -41,6 +42,16 @@ export interface AmbulanceQueryParams {
   searchTerm?: string;
   vehicleType?: AmbulanceType;
   status?: AmbulanceStatus;
+  driverAssignment?: "ASSIGNED" | "UNASSIGNED" | "ALL";
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+}
+
+export interface CreateAmbulancePayload {
+  ambulanceNumber: string;
+  registrationNumber: string;
+  registrationExpiry: string;
+  vehicleType: AmbulanceType;
+  model: string;
+  capacity: number;
 }

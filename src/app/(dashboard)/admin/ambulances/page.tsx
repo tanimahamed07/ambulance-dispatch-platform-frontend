@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import TablePagination from "@/components/ui/table-pagination";
 import AmbulanceTable from "@/components/models/ambulance/ambulance-table";
+import { CreateAmbulanceModal } from "@/components/models/ambulance/create-ambulance-modal";
 
 import { useGetAllAmbulance } from "@/hooks/ambulance.hooks";
 import useDebounce from "@/hooks/debounce.hook";
@@ -41,19 +43,35 @@ const VEHICLE_TYPES: { value: AmbulanceType | "ALL"; label: string }[] = [
   { value: "AC", label: "AC" },
   { value: "NON_AC", label: "Non-AC" },
   { value: "ICU", label: "ICU" },
+  { value: "FREEZER", label: "Freezer" },
+  { value: "AIR", label: "Air" },
+];
+
+const DRIVER_ASSIGNMENT: {
+  value: "ASSIGNED" | "UNASSIGNED" | "ALL";
+  label: string;
+}[] = [
+  { value: "ALL", label: "All Ambulances" },
+  { value: "ASSIGNED", label: "With Driver" },
+  { value: "UNASSIGNED", label: "Without Driver" },
 ];
 
 export default function AmbulancesPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<AmbulanceStatus | "ALL">("ALL");
   const [vehicleType, setVehicleType] = useState<AmbulanceType | "ALL">("ALL");
+  const [driverAssignment, setDriverAssignment] = useState<
+    "ASSIGNED" | "UNASSIGNED" | "ALL"
+  >("ALL");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const params: AmbulanceQueryParams = { page, limit: LIMIT };
   if (status !== "ALL") params.status = status;
   if (vehicleType !== "ALL") params.vehicleType = vehicleType;
+  if (driverAssignment !== "ALL") params.driverAssignment = driverAssignment;
   if (debouncedSearchTerm) params.searchTerm = debouncedSearchTerm;
 
   const { data: response, isLoading, error } = useGetAllAmbulance(params);
@@ -70,6 +88,14 @@ export default function AmbulancesPage() {
   const handleVehicleTypeChange = (value: AmbulanceType | "ALL" | null) => {
     if (value === null) return;
     setVehicleType(value);
+    setPage(1);
+  };
+
+  const handleDriverAssignmentChange = (
+    value: "ASSIGNED" | "UNASSIGNED" | "ALL" | null,
+  ) => {
+    if (value === null) return;
+    setDriverAssignment(value);
     setPage(1);
   };
 
@@ -90,6 +116,14 @@ export default function AmbulancesPage() {
             View and manage all ambulances in the system
           </p>
         </div>
+
+        <Button
+          className="w-full sm:w-auto"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add New Ambulance
+        </Button>
       </div>
 
       {/* Filter Options: Mobile (Select Dropdown) vs Desktop (Tabs) */}
@@ -130,7 +164,7 @@ export default function AmbulancesPage() {
       </div>
 
       {/* Vehicle Type and Search Filters */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Vehicle Type Filter */}
         <div className="space-y-2">
           <Label htmlFor="vehicleType">Vehicle Type</Label>
@@ -142,6 +176,26 @@ export default function AmbulancesPage() {
               {VEHICLE_TYPES.map((type) => (
                 <SelectItem key={type.value} value={type.value}>
                   {type.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Driver Assignment Filter */}
+        <div className="space-y-2">
+          <Label htmlFor="driverAssignment">Driver Assignment</Label>
+          <Select
+            value={driverAssignment}
+            onValueChange={handleDriverAssignmentChange}
+          >
+            <SelectTrigger id="driverAssignment">
+              <SelectValue placeholder="Select Assignment" />
+            </SelectTrigger>
+            <SelectContent>
+              {DRIVER_ASSIGNMENT.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -197,6 +251,12 @@ export default function AmbulancesPage() {
           )}
         </>
       )}
+
+      {/* Create Ambulance Modal */}
+      <CreateAmbulanceModal
+        isOpen={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+      />
     </div>
   );
 }

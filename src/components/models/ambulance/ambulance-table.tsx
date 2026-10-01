@@ -1,9 +1,10 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
-import { AlertCircle, MapPin, User } from "lucide-react";
+import { useState } from "react";
+import { AlertCircle, Eye, User } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -13,8 +14,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Ambulance } from "@/types/ambulence.type";
-import AmbulanceStatusBadge from "./ambulance-status-badge";
 import AmbulanceTypeBadge from "./ambulance-type-badge";
+import { AmbulanceDetailsModal } from "./ambulance-details-modal";
 
 function EmptyState() {
   return (
@@ -33,6 +34,16 @@ export default function AmbulanceTable({
 }: {
   ambulances: Ambulance[];
 }) {
+  const [selectedAmbulance, setSelectedAmbulance] = useState<Ambulance | null>(
+    null,
+  );
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  const handleViewDetails = (ambulance: Ambulance) => {
+    setSelectedAmbulance(ambulance);
+    setIsDetailsModalOpen(true);
+  };
+
   if (ambulances.length === 0) return <EmptyState />;
 
   return (
@@ -45,10 +56,8 @@ export default function AmbulanceTable({
             <TableHead>Type</TableHead>
             <TableHead>Model</TableHead>
             <TableHead>Capacity</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead>Driver</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -66,7 +75,9 @@ export default function AmbulanceTable({
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Exp:{" "}
-                    {new Date(ambulance.registrationExpiry).toLocaleDateString()}
+                    {new Date(
+                      ambulance.registrationExpiry,
+                    ).toLocaleDateString()}
                   </p>
                 </div>
               </TableCell>
@@ -84,10 +95,6 @@ export default function AmbulanceTable({
               </TableCell>
 
               <TableCell>
-                <AmbulanceStatusBadge status={ambulance.status} />
-              </TableCell>
-
-              <TableCell>
                 {ambulance.driver ? (
                   <div className="space-y-1">
                     <div className="flex items-center gap-1">
@@ -99,9 +106,6 @@ export default function AmbulanceTable({
                     <p className="text-xs text-muted-foreground">
                       {ambulance.driver.user.phone}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      License: {ambulance.driver.licenseNumber}
-                    </p>
                   </div>
                 ) : (
                   <span className="text-sm text-muted-foreground">
@@ -110,31 +114,29 @@ export default function AmbulanceTable({
                 )}
               </TableCell>
 
-              <TableCell>
-                {ambulance.currentLatitude && ambulance.currentLongitude ? (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-muted-foreground" />
-                    <p className="text-xs text-muted-foreground">
-                      {ambulance.currentLatitude.toFixed(4)},{" "}
-                      {ambulance.currentLongitude.toFixed(4)}
-                    </p>
-                  </div>
-                ) : (
-                  <span className="text-xs text-muted-foreground">
-                    Location unavailable
-                  </span>
-                )}
-              </TableCell>
-
-              <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                {formatDistanceToNow(new Date(ambulance.createdAt), {
-                  addSuffix: true,
-                })}
+              <TableCell className="text-right">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleViewDetails(ambulance)}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Details
+                </Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* Ambulance Details Modal */}
+      {selectedAmbulance && (
+        <AmbulanceDetailsModal
+          ambulance={selectedAmbulance}
+          isOpen={isDetailsModalOpen}
+          onOpenChange={setIsDetailsModalOpen}
+        />
+      )}
     </div>
   );
 }
