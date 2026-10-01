@@ -116,11 +116,11 @@ export default function AmbulanceTable({
 
               <TableCell className="text-right">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={() => handleViewDetails(ambulance.id)}
                 >
-                  <Eye className="h-4 w-4 mr-2" />
+                  <Eye className="h-4 w-4 mr-1" />
                   Details
                 </Button>
               </TableCell>

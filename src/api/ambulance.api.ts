@@ -5,7 +5,11 @@ import type {
   AmbulanceQueryParams,
   CreateAmbulancePayload,
 } from "@/types/ambulence.type";
-import type { ApiResponse, AssignDriverPayload, PaginatedResponse } from "@/types";
+import type {
+  ApiResponse,
+  AssignDriverPayload,
+  PaginatedResponse,
+} from "@/types";
 
 export function getAllAmbulance(params?: AmbulanceQueryParams) {
   return apiClient<ApiResponse<PaginatedResponse<Ambulance>>>(
@@ -27,11 +31,25 @@ export function getAmbulanceDetails(id: string) {
   return apiClient<ApiResponse<AmbulanceDetails>>(`/ambulance/${id}`);
 }
 
-
-export function assignDriverWithAmbulance(id: string, payload: AssignDriverPayload) {
+export function assignDriverWithAmbulance(
+  id: string,
+  payload: AssignDriverPayload,
+) {
   return apiClient<ApiResponse<Ambulance>>(`/ambulance/${id}/assign-driver`, {
     method: "PATCH",
     body: payload,
   });
 }
+
+
+export function unassignDriverWithAmbulance(
+  id: string,
+  payload: AssignDriverPayload,
+) {
+  return apiClient<ApiResponse<Ambulance>>(`/ambulance/${id}/unassign-driver`, {
+    method: "PATCH",
+    body: payload,
+  });
+}
+
 

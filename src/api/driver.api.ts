@@ -72,3 +72,12 @@ export function assignDriverToAmbulance(
     body: payload,
   });
 }
+export function unAssignDriverToAmbulance(
+  ambulanceId: string,
+  payload: { driverId: string },
+) {
+  return apiClient(`/ambulance/${ambulanceId}/unassign-driver`, {
+    method: "PATCH",
+    body: payload,
+  });
+}

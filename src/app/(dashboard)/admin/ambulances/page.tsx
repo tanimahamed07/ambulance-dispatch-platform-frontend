@@ -164,52 +164,117 @@ export default function AmbulancesPage() {
       </div>
 
       {/* Vehicle Type and Search Filters */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Vehicle Type Filter */}
-        <div className="space-y-2">
-          <Label htmlFor="vehicleType">Vehicle Type</Label>
-          <Select value={vehicleType} onValueChange={handleVehicleTypeChange}>
-            <SelectTrigger id="vehicleType">
-              <SelectValue placeholder="Select Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {VEHICLE_TYPES.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="space-y-4">
+        {/* Mobile Sort Controls */}
+        <div className="grid grid-cols-2 gap-3 sm:hidden">
+          {/* Vehicle Type Filter */}
+          <div className="space-y-2">
+            <Label htmlFor="vehicleType-mobile" className="text-xs">
+              Vehicle Type
+            </Label>
+            <Select value={vehicleType} onValueChange={handleVehicleTypeChange}>
+              <SelectTrigger id="vehicleType-mobile" className="w-full">
+                <SelectValue placeholder="Select Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {VEHICLE_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Driver Assignment Filter */}
+          <div className="space-y-2">
+            <Label htmlFor="driverAssignment-mobile" className="text-xs">
+              Driver
+            </Label>
+            <Select
+              value={driverAssignment}
+              onValueChange={handleDriverAssignmentChange}
+            >
+              <SelectTrigger id="driverAssignment-mobile" className="w-full">
+                <SelectValue placeholder="Assignment" />
+              </SelectTrigger>
+              <SelectContent>
+                {DRIVER_ASSIGNMENT.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Driver Assignment Filter */}
-        <div className="space-y-2">
-          <Label htmlFor="driverAssignment">Driver Assignment</Label>
-          <Select
-            value={driverAssignment}
-            onValueChange={handleDriverAssignmentChange}
-          >
-            <SelectTrigger id="driverAssignment">
-              <SelectValue placeholder="Select Assignment" />
-            </SelectTrigger>
-            <SelectContent>
-              {DRIVER_ASSIGNMENT.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Desktop Filters */}
+        <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Vehicle Type Filter */}
+          <div className="space-y-2">
+            <Label htmlFor="vehicleType">Vehicle Type</Label>
+            <Select value={vehicleType} onValueChange={handleVehicleTypeChange}>
+              <SelectTrigger id="vehicleType">
+                <SelectValue placeholder="Select Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {VEHICLE_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Driver Assignment Filter */}
+          <div className="space-y-2">
+            <Label htmlFor="driverAssignment">Driver Assignment</Label>
+            <Select
+              value={driverAssignment}
+              onValueChange={handleDriverAssignmentChange}
+            >
+              <SelectTrigger id="driverAssignment">
+                <SelectValue placeholder="Select Assignment" />
+              </SelectTrigger>
+              <SelectContent>
+                {DRIVER_ASSIGNMENT.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Search Input */}
+          <div className="space-y-2 sm:col-span-2 lg:col-span-2">
+            <Label htmlFor="search">Search</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="search"
+                placeholder="Search by ambulance number, registration, model..."
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                type="search"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Search Input */}
-        <div className="space-y-2 sm:col-span-2 lg:col-span-2">
-          <Label htmlFor="search">Search</Label>
+        {/* Mobile Search */}
+        <div className="space-y-2 sm:hidden">
+          <Label htmlFor="search-mobile" className="text-xs">
+            Search
+          </Label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="search"
-              placeholder="Search by ambulance number, registration, model..."
+              id="search-mobile"
+              placeholder="Search ambulances..."
               className="pl-9"
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}

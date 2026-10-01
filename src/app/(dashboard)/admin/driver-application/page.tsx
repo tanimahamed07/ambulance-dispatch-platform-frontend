@@ -82,8 +82,7 @@ export default function DriverApplicationPage() {
     setPage(1);
   };
 
-  const handleSortChange = (value: string | null) => {
-    if (value === null) return;
+  const handleSortChange = (value: string) => {
     setSortBy(value);
     setPage(1);
   };
@@ -152,51 +151,119 @@ export default function DriverApplicationPage() {
       </div>
 
       {/* Search and Sort Controls */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-        {/* Search Input */}
-        <div className="flex-1 space-y-2">
-          <Label htmlFor="search">Search</Label>
+      <div className="space-y-4">
+        {/* Sort Controls Row */}
+        <div className="grid grid-cols-2 gap-3 sm:hidden">
+          {/* Sort By */}
+          <div className="space-y-2">
+            <Label htmlFor="sortBy" className="text-xs">
+              Sort By
+            </Label>
+            <Select
+              value={sortBy}
+              onValueChange={(value) => {
+                if (value !== null) handleSortChange(value);
+              }}
+            >
+              <SelectTrigger id="sortBy" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="createdAt">Application Date</SelectItem>
+                <SelectItem value="licenseExpiry">License Expiry</SelectItem>
+                <SelectItem value="user.name">Name</SelectItem>
+                <SelectItem value="user.email">Email</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort Order */}
+          <div className="space-y-2">
+            <Label htmlFor="sortOrder" className="text-xs">
+              Order
+            </Label>
+            <Select value={sortOrder} onValueChange={handleSortOrderChange}>
+              <SelectTrigger id="sortOrder" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Newest First</SelectItem>
+                <SelectItem value="asc">Oldest First</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Desktop Sort and Search */}
+        <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Sort By */}
+          <div className="space-y-2">
+            <Label htmlFor="sortBy-desktop">Sort By</Label>
+            <Select
+              value={sortBy}
+              onValueChange={(value) =>
+                value !== null && handleSortChange(value)
+              }
+            >
+              <SelectTrigger id="sortBy-desktop">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="createdAt">Application Date</SelectItem>
+                <SelectItem value="licenseExpiry">License Expiry</SelectItem>
+                <SelectItem value="user.name">Name</SelectItem>
+                <SelectItem value="user.email">Email</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort Order */}
+          <div className="space-y-2">
+            <Label htmlFor="sortOrder-desktop">Order</Label>
+            <Select value={sortOrder} onValueChange={handleSortOrderChange}>
+              <SelectTrigger id="sortOrder-desktop">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Newest First</SelectItem>
+                <SelectItem value="asc">Oldest First</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Search Input */}
+          <div className="space-y-2 sm:col-span-2 lg:col-span-2">
+            <Label htmlFor="search">Search</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="search"
+                placeholder="Search by name, email, license, NID, contact..."
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                type="search"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Search */}
+        <div className="space-y-2 sm:hidden">
+          <Label htmlFor="search-mobile" className="text-xs">
+            Search
+          </Label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="search"
-              placeholder="Search by name, email, license, NID, contact..."
+              id="search-mobile"
+              placeholder="Search applications..."
               className="pl-9"
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
               type="search"
             />
           </div>
-        </div>
-
-        {/* Sort By */}
-        <div className="space-y-2 w-full sm:w-48">
-          <Label htmlFor="sortBy">Sort By</Label>
-          <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger id="sortBy">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="createdAt">Application Date</SelectItem>
-              <SelectItem value="licenseExpiry">License Expiry</SelectItem>
-              <SelectItem value="user.name">Name</SelectItem>
-              <SelectItem value="user.email">Email</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Sort Order */}
-        <div className="space-y-2 w-full sm:w-36">
-          <Label htmlFor="sortOrder">Order</Label>
-          <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-            <SelectTrigger id="sortOrder">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="desc">Newest First</SelectItem>
-              <SelectItem value="asc">Oldest First</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 

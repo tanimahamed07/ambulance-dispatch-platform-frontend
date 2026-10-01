@@ -3,6 +3,7 @@ import {
   createAmbulance,
   getAllAmbulance,
   getAmbulanceDetails,
+  unassignDriverWithAmbulance,
 } from "@/api/ambulance.api";
 import { AssignDriverPayload } from "@/types";
 import type { AmbulanceQueryParams } from "@/types/ambulence.type";
@@ -46,8 +47,40 @@ export function useAssignDriverWithAmbulance() {
       payload: AssignDriverPayload;
     }) => assignDriverWithAmbulance(id, payload),
 
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      // Invalidate ambulance details cache
+      queryClient.invalidateQueries({
+        queryKey: ["ambulance-details", variables.id],
+      });
+      // Invalidate ambulances list
       queryClient.invalidateQueries({ queryKey: ["ambulances"] });
+      // Invalidate drivers list
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
+    },
+  });
+}
+
+export function useUnAssignDriverWithAmbulance() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: AssignDriverPayload;
+    }) => unassignDriverWithAmbulance(id, payload),
+
+    onSuccess: (_data, variables) => {
+      // Invalidate ambulance details cache
+      queryClient.invalidateQueries({
+        queryKey: ["ambulance-details", variables.id],
+      });
+      // Invalidate ambulances list
+      queryClient.invalidateQueries({ queryKey: ["ambulances"] });
+      // Invalidate drivers list
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
     },
   });
 }

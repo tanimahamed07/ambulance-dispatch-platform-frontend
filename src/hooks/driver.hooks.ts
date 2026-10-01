@@ -14,7 +14,10 @@ import type {
   ApproveDriverPayload,
 } from "@/types/driver.type";
 import { toast } from "@/components/ui/toast";
-import { assignDriverWithAmbulance } from "@/api/ambulance.api";
+import {
+  assignDriverWithAmbulance,
+  unassignDriverWithAmbulance,
+} from "@/api/ambulance.api";
 
 export function useGetAllDrivers(params?: DriverQueryParams) {
   return useQuery({
@@ -118,6 +121,25 @@ export function useAssignDriverWithAmbulance() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ambulances"] });
+    },
+  });
+}
+
+export function useUnAssignDriverWithAmbulance() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: { driverId: string };
+    }) => unassignDriverWithAmbulance(id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ambulances"] });
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
     },
   });
 }
