@@ -5,10 +5,12 @@ import {
   applyDriver,
   getAllDriverApplication,
   getDriverDetails,
+  updateDriverApplicationStatus,
 } from "@/api/driver.api";
 import type {
   DriverQueryParams,
   AssignDriverPayload,
+  ApproveDriverPayload,
 } from "@/types/driver.type";
 import { toast } from "@/components/ui/toast";
 
@@ -26,7 +28,7 @@ export function useAssignDriver(emergencyId: string) {
     mutationFn: (payload: AssignDriverPayload) =>
       assignDriver(emergencyId, payload),
     onSuccess: () => {
-      toast.create({
+      toast.add({
         type: "success",
         title: "Success",
         description: "Driver assigned successfully",
@@ -38,7 +40,7 @@ export function useAssignDriver(emergencyId: string) {
       queryClient.invalidateQueries({ queryKey: ["emergencies"] });
     },
     onError: (error: any) => {
-      toast.create({
+      toast.add({
         type: "error",
         title: "Error",
         description: error?.message || "Failed to assign driver",
@@ -65,5 +67,37 @@ export function useGetDriverDetails(id: string | null, enabled = true) {
     queryKey: ["driver-details", id],
     queryFn: () => getDriverDetails(id as string),
     enabled: !!id && enabled,
+  });
+}
+
+export function useDriverApplicationStatusUpdate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: ApproveDriverPayload) =>
+      updateDriverApplicationStatus(payload),
+    onSuccess: (data, variables) => {
+      const action =
+        variables.approvalStatus === "APPROVED" ? "approved" : "rejected";
+      toast.add({
+        type: "success",
+        title: "Success",
+        description: `Driver application ${action} successfully`,
+      });
+      // Refetch driver applications list
+      queryClient.invalidateQueries({ queryKey: ["driver-applications"] });
+      // Refetch driver details
+      queryClient.invalidateQueries({
+        queryKey: ["driver-details", variables.driverId],
+      });
+    },
+    onError: (error: any) => {
+      toast.add({
+        type: "error",
+        title: "Error",
+        description:
+          error?.message || "Failed to update driver application status",
+      });
+    },
   });
 }

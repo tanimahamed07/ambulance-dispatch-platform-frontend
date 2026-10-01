@@ -5,6 +5,7 @@ import type {
   DriverQueryParams,
   AssignDriverPayload,
   ApplyDriverPayload,
+  ApproveDriverPayload,
 } from "@/types/driver.type";
 
 export function getAllDrivers(params?: DriverQueryParams) {
@@ -15,6 +16,7 @@ export function getAllDrivers(params?: DriverQueryParams) {
     },
   );
 }
+
 export function getAllDriverApplication(params?: DriverQueryParams) {
   // Extract approvalStatus from params to handle it properly
   const { approvalStatus, ...restParams } = params || {};
@@ -50,6 +52,13 @@ export function assignDriver(
 ) {
   return apiClient(`/emergency/${emergencyId}/dispatch`, {
     method: "POST",
+    body: payload,
+  });
+}
+
+export function updateDriverApplicationStatus(payload: ApproveDriverPayload) {
+  return apiClient<ApiResponse<Driver>>("/driver/approve-driver", {
+    method: "PATCH",
     body: payload,
   });
 }

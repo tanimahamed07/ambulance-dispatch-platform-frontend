@@ -64,3 +64,10 @@ export interface ApplyDriverPayload {
   licenseExpiry: Date;
   nidNumber: string;
 }
+
+export interface ApproveDriverPayload {
+  driverId: string;
+  approvalStatus: DriverApprovalStatus;
+  rejectionReason?: RejectionReason;
+  rejectionNote?: string;
+}

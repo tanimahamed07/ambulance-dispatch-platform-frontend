@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { format } from "date-fns";
-import { Loader2, ExternalLink } from "lucide-react";
+import { Loader2, ExternalLink, CheckCircle, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
-import type { DriverApprovalStatus } from "@/types/driver.type";
-import { useGetDriverDetails } from "@/hooks/driver.hooks";
+import type {
+  DriverApprovalStatus,
+  RejectionReason,
+} from "@/types/driver.type";
+import {
+  useGetDriverDetails,
+  useDriverApplicationStatusUpdate,
+} from "@/hooks/driver.hooks";
 
 interface DriverApplicationDetailsModalProps {
   driverId: string | null;
@@ -42,6 +58,14 @@ const REJECTION_REASON_LABELS: Record<string, string> = {
   INCOMPLETE_DOCUMENTS: "Incomplete Documents",
   OTHER: "Other",
 };
+
+const REJECTION_REASONS: RejectionReason[] = [
+  "INVALID_LICENSE",
+  "EXPIRED_LICENSE",
+  "FAILED_BACKGROUND_CHECK",
+  "INCOMPLETE_DOCUMENTS",
+  "OTHER",
+];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -75,16 +99,68 @@ export function DriverApplicationDetailsModal({
   isOpen,
   onOpenChange,
 }: DriverApplicationDetailsModalProps) {
+  const [showRejectForm, setShowRejectForm] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState<RejectionReason | "">(
+    "",
+  );
+  const [rejectionNote, setRejectionNote] = useState("");
+
   const { data, isLoading, isError, error } = useGetDriverDetails(
     driverId,
     isOpen,
   );
+
+  const { mutate: updateStatus, isPending: isUpdating } =
+    useDriverApplicationStatusUpdate();
 
   const driver = data?.data;
 
   const statusConfig = driver
     ? APPROVAL_STATUS_CONFIG[driver.approvalStatus]
     : null;
+
+  const handleApprove = () => {
+    if (!driver) return;
+
+    updateStatus(
+      {
+        driverId: driver.id,
+        approvalStatus: "APPROVED",
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+        },
+      },
+    );
+  };
+
+  const handleReject = () => {
+    if (!driver || !rejectionReason) return;
+
+    updateStatus(
+      {
+        driverId: driver.id,
+        approvalStatus: "REJECTED",
+        rejectionReason: rejectionReason as RejectionReason,
+        rejectionNote: rejectionNote || undefined,
+      },
+      {
+        onSuccess: () => {
+          setShowRejectForm(false);
+          setRejectionReason("");
+          setRejectionNote("");
+          onOpenChange(false);
+        },
+      },
+    );
+  };
+
+  const handleCancelReject = () => {
+    setShowRejectForm(false);
+    setRejectionReason("");
+    setRejectionNote("");
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -240,12 +316,96 @@ export function DriverApplicationDetailsModal({
 
             {/* Action Buttons (for pending applications) */}
             {driver.approvalStatus === "PENDING" && (
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <Button variant="outline" className="w-full">
-                  Reject
-                </Button>
-                <Button className="w-full">Approve</Button>
-              </div>
+              <>
+                {!showRejectForm ? (
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setShowRejectForm(true)}
+                      disabled={isUpdating}
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Reject
+                    </Button>
+                    <Button
+                      className="w-full"
+                      onClick={handleApprove}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                      )}
+                      Approve
+                    </Button>
+                  </div>
+                ) : (
+                  <Section title="Rejection Form">
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="rejectionReason">
+                          Rejection Reason{" "}
+                          <span className="text-destructive">*</span>
+                        </Label>
+                        <Select
+                          value={rejectionReason}
+                          onValueChange={(value) =>
+                            setRejectionReason(value as RejectionReason)
+                          }
+                        >
+                          <SelectTrigger id="rejectionReason">
+                            <SelectValue placeholder="Select a reason" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {REJECTION_REASONS.map((reason) => (
+                              <SelectItem key={reason} value={reason}>
+                                {REJECTION_REASON_LABELS[reason]}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="rejectionNote">
+                          Additional Note (Optional)
+                        </Label>
+                        <Textarea
+                          id="rejectionNote"
+                          placeholder="Provide additional details about the rejection..."
+                          value={rejectionNote}
+                          onChange={(e) => setRejectionNote(e.target.value)}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <Button
+                          variant="outline"
+                          onClick={handleCancelReject}
+                          disabled={isUpdating}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={handleReject}
+                          disabled={!rejectionReason || isUpdating}
+                        >
+                          {isUpdating ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <XCircle className="h-4 w-4 mr-2" />
+                          )}
+                          Confirm Reject
+                        </Button>
+                      </div>
+                    </div>
+                  </Section>
+                )}
+              </>
             )}
           </div>
         )}
