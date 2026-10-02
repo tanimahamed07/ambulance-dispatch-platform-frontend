@@ -7,6 +7,8 @@ import {
   getDriverDetails,
   updateDriverApplicationStatus,
   assignDriverToAmbulance,
+  driverStatusUpdate,
+  getDriverProfile,
 } from "@/api/driver.api";
 import type {
   DriverQueryParams,
@@ -141,5 +143,27 @@ export function useUnAssignDriverWithAmbulance() {
       queryClient.invalidateQueries({ queryKey: ["ambulances"] });
       queryClient.invalidateQueries({ queryKey: ["drivers"] });
     },
+  });
+}
+
+export function useDriverStatusUpdate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (isAvailable: boolean) => driverStatusUpdate(isAvailable),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["driver"],
+      });
+    },
+  });
+}
+
+export function useGetDriverProfile() {
+  return useQuery({
+    queryKey: ["driver"],
+    queryFn: getDriverProfile,
+    retry: false,
   });
 }

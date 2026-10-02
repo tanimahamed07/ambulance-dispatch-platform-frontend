@@ -6,6 +6,7 @@ import type {
   AssignDriverPayload,
   ApplyDriverPayload,
   ApproveDriverPayload,
+  DutyStatusResponse,
 } from "@/types/driver.type";
 
 export function getAllDrivers(params?: DriverQueryParams) {
@@ -72,6 +73,7 @@ export function assignDriverToAmbulance(
     body: payload,
   });
 }
+
 export function unAssignDriverToAmbulance(
   ambulanceId: string,
   payload: { driverId: string },
@@ -81,3 +83,18 @@ export function unAssignDriverToAmbulance(
     body: payload,
   });
 }
+
+export function driverStatusUpdate(isAvailable: boolean) {
+  return apiClient("/driver/me/status", {
+    method: "PATCH",
+    body: {
+      isAvailable,
+    },
+  });
+}
+
+export function getDriverProfile() {
+  return apiClient<{ data: DutyStatusResponse }>("/driver/me/profile");
+}
+
+

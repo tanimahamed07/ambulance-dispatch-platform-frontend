@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Activity, Plus, List } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export default function AdminPage() {
   return (

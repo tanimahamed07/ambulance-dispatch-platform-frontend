@@ -1,16 +1,37 @@
 import {
   Ambulance,
   LayoutDashboard,
-  LifeBuoy,
+  ClipboardList,
   Navigation,
-  Route,
+  History,
 } from "lucide-react";
 import type { SidebarItems } from "@/types";
 
 export const driverRoutes: SidebarItems = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/trips", label: "My Trips", icon: Navigation },
-  { href: "/dashboard/route", label: "My Route", icon: Route },
-  { href: "/dashboard/vehicle", label: "My Vehicle", icon: Ambulance },
-  { href: "/dashboard/support", label: "Help & Support", icon: LifeBuoy },
+  {
+    href: "/driver",
+    label: "Overview",
+    icon: LayoutDashboard,
+    exact: true,
+  },
+  {
+    href: "/driver/dispatches",
+    label: "Assigned Requests",
+    icon: ClipboardList,
+  },
+  {
+    href: "/driver/active-trip",
+    label: "Active Trip",
+    icon: Navigation,
+  },
+  {
+    href: "/driver/history",
+    label: "Trip History",
+    icon: History,
+  },
+  {
+    href: "/driver/ambulance",
+    label: "My Ambulance",
+    icon: Ambulance,
+  },
 ];
