@@ -1,6 +1,7 @@
 import apiClient from "@/lib/apiClient";
 import { ApiResponse, PaginatedResponse } from "@/types/api.type";
 import {
+  CreateDispatchPayload,
   Emergency,
   EmergencyDetails,
   EmergencyPayload,
@@ -30,4 +31,9 @@ export function getEmergencyDetails(id: string) {
   return apiClient<ApiResponse<EmergencyDetails>>(`/emergency/${id}`);
 }
 
-
+export function createDispatch(payload: CreateDispatchPayload) {
+  return apiClient("/dispatch/create-dispatch", {
+    method: "POST",
+    body: payload,
+  });
+}

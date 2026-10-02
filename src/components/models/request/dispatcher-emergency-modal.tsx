@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { format, formatDistanceToNow } from "date-fns";
-import { CheckCircle2, Circle, Loader2 } from "lucide-react";
+import { CheckCircle2, Circle, Loader2, UserPlus } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,12 +14,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/toast";
 
 import type { EmergencyTrip } from "@/types/emergency.type";
+import type { DispatchableDriver } from "@/types/driver.type";
 import EmergencyPriorityBadge from "../emergencies/emergency-priority-badge";
 import EmergencyStatusBadge from "../emergencies/emergency-status-badge";
 import { useGetEmergencyDetails } from "@/hooks";
-import { AssignDriverModal } from "./assign-driver-modal";
+import { useGetDispatchableDrivers } from "@/hooks/driver.hooks";
+import { useCreateDispatch } from "@/hooks/emergency.hooks";
 
 interface DispatcherEmergencyModalProps {
   emergencyId: string | null;
@@ -50,6 +61,33 @@ function Row({ label, value }: { label: string; value?: ReactNode }) {
 
 const fmt = (date: string | null) =>
   date ? format(new Date(date), "dd MMM yyyy, hh:mm a") : null;
+
+// Used both inside the Select trigger and inside each dropdown item
+function DriverOption({ driver }: { driver: DispatchableDriver }) {
+  return (
+    <div className="flex w-full items-center gap-3 text-left">
+      {driver.user?.profilePicture ? (
+        <img
+          src={driver.user.profilePicture}
+          alt={driver.user.name}
+          className="h-9 w-9 shrink-0 rounded-full object-cover"
+        />
+      ) : (
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">
+          {driver.user?.name.charAt(0).toUpperCase() || "?"}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">
+          {driver.user?.name || "Unknown"}
+        </p>
+        <p className="truncate text-xs text-muted-foreground">
+          {driver.licenseNumber} · {driver.contactNumber}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function TripTimeline({ trip }: { trip: EmergencyTrip }) {
   const steps = [
@@ -87,18 +125,76 @@ export function DispatcherEmergencyModal({
   isOpen,
   onOpenChange,
 }: DispatcherEmergencyModalProps) {
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [selectedDriverId, setSelectedDriverId] = useState("");
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [showAssignForm, setShowAssignForm] = useState(false);
 
   const { data, isLoading, isError, error } = useGetEmergencyDetails(
     emergencyId,
     isOpen,
   );
 
+  const { data: driversData, isLoading: driversLoading } =
+    useGetDispatchableDrivers({
+      isAvailable: true,
+      limit: 100,
+    });
+
+  const { mutate: createDispatchMutation } = useCreateDispatch();
+
   const emergency = data?.data;
   const dispatch = emergency?.dispatch ?? null;
   const trip = dispatch?.trips ?? null;
 
   const canAssignDriver = emergency?.status === "PENDING" && !dispatch;
+
+  const availableDrivers: DispatchableDriver[] = driversData?.data?.data || [];
+  const selectedDriver = availableDrivers.find(
+    (d) => d.id === selectedDriverId,
+  );
+
+  const handleAssignDriver = () => {
+    if (!selectedDriverId || !emergencyId) return;
+
+    setIsAssigning(true);
+
+    createDispatchMutation(
+      {
+        emergencyId,
+        driverId: selectedDriverId,
+      },
+      {
+        onSuccess: () => {
+          toast.add({
+            type: "success",
+            title: "Success",
+            description: "Driver assigned to emergency successfully",
+          });
+
+          setSelectedDriverId("");
+          setIsAssigning(false);
+          setShowAssignForm(false);
+
+          onOpenChange(false);
+        },
+
+        onError: (error: any) => {
+          toast.add({
+            title: "Error",
+            description:
+              error?.message || "Failed to assign driver to emergency",
+            type: "error",
+          });
+          setIsAssigning(false);
+        },
+      },
+    );
+  };
+
+  const handleCancelAssign = () => {
+    setShowAssignForm(false);
+    setSelectedDriverId("");
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -213,13 +309,111 @@ export function DispatcherEmergencyModal({
                   <p className="text-sm text-muted-foreground mb-3">
                     No ambulance assigned yet.
                   </p>
-                  {canAssignDriver && (
+                  {canAssignDriver && !showAssignForm && (
                     <Button
-                      onClick={() => setIsAssignModalOpen(true)}
+                      onClick={() => setShowAssignForm(true)}
                       className="w-full"
                     >
+                      <UserPlus className="h-4 w-4 mr-2" />
                       Assign Driver
                     </Button>
+                  )}
+
+                  {canAssignDriver && showAssignForm && (
+                    <div className="space-y-3">
+                      {driversLoading ? (
+                        <div className="flex justify-center py-4">
+                          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                        </div>
+                      ) : availableDrivers.length > 0 ? (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="driverSelect">
+                              Select Available Driver{" "}
+                              <span className="text-destructive">*</span>
+                            </Label>
+
+                            <Select
+                              value={selectedDriverId || null}
+                              onValueChange={(value) =>
+                                setSelectedDriverId(value ?? "")
+                              }
+                            >
+                              <SelectTrigger
+                                id="driverSelect"
+                                className="h-auto min-h-12 w-full py-2"
+                              >
+                                <SelectValue>
+                                  {() =>
+                                    selectedDriver ? (
+                                      <DriverOption driver={selectedDriver} />
+                                    ) : (
+                                      <span className="text-muted-foreground">
+                                        Choose a driver from the list
+                                      </span>
+                                    )
+                                  }
+                                </SelectValue>
+                              </SelectTrigger>
+
+                              <SelectContent
+                                alignItemWithTrigger={false}
+                                sideOffset={6}
+                                className="max-h-72 w-(--anchor-width)"
+                              >
+                                {availableDrivers.map((driver) => (
+                                  <SelectItem
+                                    key={driver.id}
+                                    value={driver.id}
+                                    className="py-2.5"
+                                  >
+                                    <DriverOption driver={driver} />
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            {/* Driver count info */}
+                            <p className="text-xs text-muted-foreground">
+                              {availableDrivers.length} available{" "}
+                              {availableDrivers.length === 1
+                                ? "driver"
+                                : "drivers"}{" "}
+                              found
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3 pt-2">
+                            <Button
+                              variant="outline"
+                              onClick={handleCancelAssign}
+                              disabled={isAssigning}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleAssignDriver}
+                              disabled={!selectedDriverId || isAssigning}
+                            >
+                              {isAssigning ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <UserPlus className="h-4 w-4 mr-2" />
+                              )}
+                              Confirm
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-center py-4 text-sm text-muted-foreground">
+                          <p>No available drivers found</p>
+                          <p className="text-xs mt-1">
+                            All approved drivers are currently assigned or
+                            unavailable
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </>
               )}
@@ -251,15 +445,6 @@ export function DispatcherEmergencyModal({
           </div>
         )}
       </DialogContent>
-
-      {/* Assign Driver Modal */}
-      {emergencyId && (
-        <AssignDriverModal
-          emergencyId={emergencyId}
-          isOpen={isAssignModalOpen}
-          onOpenChange={setIsAssignModalOpen}
-        />
-      )}
     </Dialog>
   );
 }

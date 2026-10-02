@@ -14,21 +14,51 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Emergency, EmergencyType } from "@/types/emergency.type";
-import EmergencyPriorityBadge from "../emergencies/emergency-priority-badge";
-import EmergencyStatusBadge from "../emergencies/emergency-status-badge";
+import type {
+  Emergency,
+  EmergencyType,
+  Priority,
+  EmergencyStatus,
+} from "@/types/emergency.type";
 import { DispatcherEmergencyModal } from "./dispatcher-emergency-modal";
 
-const EMERGENCY_TYPE_LABELS: Record<
-  EmergencyType,
-  { label: string; icon: string }
+const PRIORITY_CONFIG: Record<
+  Priority,
+  {
+    label: string;
+    variant: "default" | "secondary" | "destructive" | "outline";
+  }
 > = {
-  ACCIDENT: { label: "Accident", icon: "🚗" },
-  CARDIAC: { label: "Cardiac", icon: "❤️" },
-  PREGNANCY: { label: "Pregnancy", icon: "🤰" },
-  TRAUMA: { label: "Trauma", icon: "🩹" },
-  BREATHING_PROBLEM: { label: "Breathing", icon: "🫁" },
-  OTHER: { label: "Other", icon: "🏥" },
+  LOW: { label: "Low", variant: "secondary" },
+  MEDIUM: { label: "Medium", variant: "outline" },
+  HIGH: { label: "High", variant: "default" },
+  CRITICAL: { label: "Critical", variant: "destructive" },
+};
+
+const STATUS_CONFIG: Record<
+  EmergencyStatus,
+  {
+    label: string;
+    variant: "default" | "secondary" | "destructive" | "outline";
+  }
+> = {
+  PENDING: { label: "Pending", variant: "secondary" },
+  ASSIGNED: { label: "Assigned", variant: "outline" },
+  EN_ROUTE: { label: "En Route", variant: "default" },
+  PICKED_UP: { label: "Picked Up", variant: "default" },
+  IN_PROGRESS: { label: "In Progress", variant: "default" },
+  COMPLETED: { label: "Completed", variant: "default" },
+  CANCELLED: { label: "Cancelled", variant: "destructive" },
+};
+
+const EMERGENCY_TYPE_LABEL: Record<EmergencyType, string> = {
+  ACCIDENT: "Accident",
+  CARDIAC: "Cardiac",
+  STROKE: "Stroke",
+  PREGNANCY: "Pregnancy",
+  TRAUMA: "Trauma",
+  BREATHING_PROBLEM: "Breathing Problem",
+  OTHER: "Other",
 };
 
 function EmptyState() {
@@ -37,7 +67,7 @@ function EmptyState() {
       <AlertCircle className="h-8 w-8 text-muted-foreground" />
       <h3 className="mt-3 text-lg font-semibold">No emergencies found</h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        Try changing the filters or make a new request.
+        There are no emergency requests at the moment.
       </p>
     </div>
   );
@@ -49,116 +79,101 @@ export default function DispatcherEmergenciesTable({
   emergencies: Emergency[];
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
 
-  const handleOpenDetails = (emergency: Emergency) => {
-    setSelectedId(emergency.id);
-    setIsOpen(true);
-  };
-
-  if (emergencies.length === 0) return <EmptyState />;
+  if (!emergencies || emergencies.length === 0) return <EmptyState />;
 
   return (
     <>
-      <div className="rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Patient</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Ambulance</TableHead>
-              <TableHead>Pickup</TableHead>
-              <TableHead>Requested</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+      <div className="rounded-lg border overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[280px]">Patient</TableHead>
+                <TableHead className="w-[130px]">Contact</TableHead>
+                <TableHead className="w-[140px]">Emergency Type</TableHead>
+                <TableHead className="w-[100px]">Priority</TableHead>
+                <TableHead className="w-[120px]">Status</TableHead>
+                <TableHead className="w-[130px]">Requested</TableHead>
+                <TableHead className="text-right w-[100px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
 
-          <TableBody>
-            {emergencies.map((emergency) => {
-              const type = EMERGENCY_TYPE_LABELS[emergency.emergencyType];
-              const { dispatch } = emergency as Emergency & {
-                dispatch?: {
-                  ambulance: { ambulanceNumber: string };
-                  driver: { user: { name: string } };
-                  status: string;
-                };
-              };
+            <TableBody>
+              {emergencies.map((emergency) => {
+                const statusConfig = STATUS_CONFIG[emergency.status];
+                const priorityConfig = PRIORITY_CONFIG[emergency.priority];
 
-              return (
-                <TableRow key={emergency.id}>
-                  <TableCell>
-                    <p className="font-medium">{emergency.patientName}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {emergency.patientPhone}
-                    </p>
-                  </TableCell>
-
-                  <TableCell>
-                    {type.icon} {type.label}
-                  </TableCell>
-
-                  <TableCell>
-                    <EmergencyPriorityBadge priority={emergency.priority} />
-                  </TableCell>
-
-                  <TableCell>
-                    <EmergencyStatusBadge status={emergency.status} />
-                  </TableCell>
-
-                  <TableCell>
-                    {dispatch ? (
-                      <div className="space-y-1">
-                        <p className="font-medium">
-                          {dispatch.ambulance.ambulanceNumber}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {dispatch.driver.user.name}
-                        </p>
-                        <Badge variant="outline">{dispatch.status}</Badge>
+                return (
+                  <TableRow key={emergency.id}>
+                    <TableCell className="max-w-[280px]">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 font-medium text-primary">
+                          {emergency.patientName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate">
+                            {emergency.patientName}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {emergency.pickupAddress}
+                          </p>
+                        </div>
                       </div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">
-                        Not assigned
-                      </span>
-                    )}
-                  </TableCell>
+                    </TableCell>
 
-                  <TableCell className="max-w-xs whitespace-normal">
-                    <p className="line-clamp-2 text-sm">
-                      {emergency.pickupAddress}
-                    </p>
-                  </TableCell>
+                    <TableCell>
+                      <code className="font-mono text-sm">
+                        {emergency.patientPhone}
+                      </code>
+                    </TableCell>
 
-                  <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                    {formatDistanceToNow(new Date(emergency.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </TableCell>
+                    <TableCell className="text-sm">
+                      {EMERGENCY_TYPE_LABEL[emergency.emergencyType]}
+                    </TableCell>
 
-                  <TableCell className="text-right">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenDetails(emergency)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      Details
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                    <TableCell>
+                      <Badge variant={priorityConfig.variant}>
+                        {priorityConfig.label}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge variant={statusConfig.variant}>
+                        {statusConfig.label}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                      {formatDistanceToNow(new Date(emergency.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </TableCell>
+
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedId(emergency.id)}
+                      >
+                        <Eye className="mr-1 h-4 w-4" />
+                        Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-      {/* Emergency Detail Modal */}
       <DispatcherEmergencyModal
         emergencyId={selectedId}
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
+        isOpen={selectedId !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedId(null);
+        }}
       />
     </>
   );

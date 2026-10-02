@@ -2,6 +2,7 @@ export type EmergencyType =
   | "ACCIDENT"
   | "CARDIAC"
   | "PREGNANCY"
+  | "STROKE"
   | "TRAUMA"
   | "BREATHING_PROBLEM"
   | "OTHER";
@@ -30,8 +31,7 @@ export type EmergencyStatus =
 export type DispatchStatus =
   | "PENDING"
   | "ACCEPTED"
-  | "EN_ROUTE"
-  | "ARRIVED"
+  | "REJECTED"
   | "COMPLETED"
   | "CANCELLED";
 
@@ -56,8 +56,6 @@ export interface EmergencyQueryParams {
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 }
-
-
 
 export type TripStatus =
   | "DISPATCHED"
@@ -148,4 +146,9 @@ export interface EmergencyDetails extends Emergency {
   cancelledAt: string | null;
   caller?: EmergencyCaller; // staff only
   dispatch: EmergencyDispatch | null;
+}
+
+export interface CreateDispatchPayload {
+  emergencyId: string;
+  driverId: string;
 }

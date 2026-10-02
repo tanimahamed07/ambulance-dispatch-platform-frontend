@@ -1,11 +1,17 @@
 import {
   ambulanceRequest,
+  createDispatch,
   getEmergenciesRequest,
   getEmergencyDetails,
   getMyEmergencies,
 } from "@/api";
 import type { EmergencyQueryParams } from "@/types/emergency.type";
-import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export function useAmbulanceRequest() {
   return useMutation({
@@ -40,5 +46,16 @@ export function useGetEmergencyDetails(id: string | null, enabled = true) {
     queryKey: ["emergency-details", id],
     queryFn: () => getEmergencyDetails(id as string),
     enabled: enabled && !!id,
+  });
+}
+
+export function useCreateDispatch() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createDispatch,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["emergencies"] });
+      queryClient.invalidateQueries({ queryKey: ["emergency-details"] });
+    },
   });
 }

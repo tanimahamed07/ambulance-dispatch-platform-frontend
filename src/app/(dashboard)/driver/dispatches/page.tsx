@@ -1,29 +1,386 @@
 "use client";
 
-import { ClipboardList } from "lucide-react";
+import { useState } from "react";
+import { Search } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import TablePagination from "@/components/ui/table-pagination";
+import DispatchTable from "@/components/models/dispatch/dispatch-table";
+
+import { useGetMyDispatches } from "@/hooks/dispatch.hooks";
+import useDebounce from "@/hooks/debounce.hook";
+import type { MyDispatchParams } from "@/types/dispatch.type";
+import type {
+  DispatchStatus,
+  EmergencyType,
+  Priority,
+} from "@/types/emergency.type";
+
+const LIMIT = 10;
+
+const STATUS_TABS: { value: DispatchStatus | "ALL"; label: string }[] = [
+  { value: "ALL", label: "All Requests" },
+  { value: "PENDING", label: "Pending" },
+  { value: "ACCEPTED", label: "Accepted" },
+  { value: "REJECTED", label: "Rejected" },
+];
 
 export default function DriverDispatchesPage() {
-  return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <div className="space-y-2">
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">
-          Assigned Requests
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Emergency requests assigned to you by admin/dispatcher. Accept or reject assignments.
-        </p>
-      </div>
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState<DispatchStatus | "ALL">("PENDING");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<string>("dispatchedAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [emergencyType, setEmergencyType] = useState<EmergencyType | "ALL">(
+    "ALL",
+  );
+  const [priority, setPriority] = useState<Priority | "ALL">("ALL");
 
-      {/* Placeholder */}
-      <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-dashed border-border">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <ClipboardList className="h-12 w-12 text-muted-foreground" />
-          <h3 className="text-lg font-semibold">No Assigned Requests</h3>
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const params: MyDispatchParams = {
+    page,
+    limit: LIMIT,
+    sortBy,
+    sortOrder,
+  };
+
+  // Add filters to params
+  if (status !== "ALL") params.status = status;
+  if (emergencyType !== "ALL") params.emergencyType = emergencyType;
+  if (priority !== "ALL") params.priority = priority;
+  if (debouncedSearchTerm) params.searchTerm = debouncedSearchTerm;
+
+  const { data: response, isLoading, error } = useGetMyDispatches(params);
+
+  const dispatches = response?.data?.data ?? [];
+  const meta = response?.data?.meta;
+
+  const handleStatusChange = (value: DispatchStatus | "ALL" | null) => {
+    if (value === null) return;
+    setStatus(value);
+    setPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setPage(1);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortBy(value);
+    setPage(1);
+  };
+
+  const handleSortOrderChange = (value: "asc" | "desc" | null) => {
+    if (value === null) return;
+    setSortOrder(value);
+    setPage(1);
+  };
+
+  const handleEmergencyTypeChange = (value: EmergencyType | "ALL" | null) => {
+    if (value === null) return;
+    setEmergencyType(value);
+    setPage(1);
+  };
+
+  const handlePriorityChange = (value: Priority | "ALL" | null) => {
+    if (value === null) return;
+    setPriority(value);
+    setPage(1);
+  };
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Assigned Requests
+          </h1>
           <p className="text-sm text-muted-foreground">
-            You don't have any assigned emergency requests at the moment.
+            Manage your assigned dispatch requests
           </p>
         </div>
+
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">{meta?.total ?? 0} Total Requests</Badge>
+        </div>
       </div>
+
+      {/* Filter Options: Mobile (Select Dropdown) vs Desktop (Tabs) */}
+      <div>
+        {/* Mobile View: Select Dropdown */}
+        <div className="sm:hidden space-y-1.5">
+          <Label>Filter by Status</Label>
+          <Select value={status} onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_TABS.map((tab) => (
+                <SelectItem key={tab.value} value={tab.value}>
+                  {tab.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Desktop View: Tabs */}
+        <div className="hidden sm:block">
+          <Tabs
+            value={status}
+            onValueChange={handleStatusChange}
+            className="w-full"
+          >
+            <TabsList className="grid h-auto w-full max-w-2xl grid-cols-4">
+              {STATUS_TABS.map((tab) => (
+                <TabsTrigger key={tab.value} value={tab.value}>
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Search and Filter Controls */}
+      <div className="space-y-4">
+        {/* Mobile Filter Controls */}
+        <div className="grid grid-cols-2 gap-3 sm:hidden">
+          {/* Emergency Type */}
+          <div className="space-y-2">
+            <Label htmlFor="emergencyType-mobile" className="text-xs">
+              Emergency Type
+            </Label>
+            <Select
+              value={emergencyType}
+              onValueChange={handleEmergencyTypeChange}
+            >
+              <SelectTrigger id="emergencyType-mobile" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Types</SelectItem>
+                <SelectItem value="ACCIDENT">Accident</SelectItem>
+                <SelectItem value="CARDIAC">Cardiac</SelectItem>
+                <SelectItem value="STROKE">Stroke</SelectItem>
+                <SelectItem value="PREGNANCY">Pregnancy</SelectItem>
+                <SelectItem value="TRAUMA">Trauma</SelectItem>
+                <SelectItem value="BREATHING_PROBLEM">
+                  Breathing Problem
+                </SelectItem>
+                <SelectItem value="OTHER">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Priority */}
+          <div className="space-y-2">
+            <Label htmlFor="priority-mobile" className="text-xs">
+              Priority
+            </Label>
+            <Select value={priority} onValueChange={handlePriorityChange}>
+              <SelectTrigger id="priority-mobile" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Priorities</SelectItem>
+                <SelectItem value="LOW">Low</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="HIGH">High</SelectItem>
+                <SelectItem value="CRITICAL">Critical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort By */}
+          <div className="space-y-2">
+            <Label htmlFor="sortBy" className="text-xs">
+              Sort By
+            </Label>
+            <Select value={sortBy} onValueChange={handleSortChange}>
+              <SelectTrigger id="sortBy" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dispatchedAt">Dispatch Date</SelectItem>
+                <SelectItem value="acceptedAt">Accepted Date</SelectItem>
+                <SelectItem value="emergency.priority">Priority</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort Order */}
+          <div className="space-y-2">
+            <Label htmlFor="sortOrder" className="text-xs">
+              Order
+            </Label>
+            <Select value={sortOrder} onValueChange={handleSortOrderChange}>
+              <SelectTrigger id="sortOrder" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Newest First</SelectItem>
+                <SelectItem value="asc">Oldest First</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Desktop Filter and Sort Controls */}
+        <div className="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+          {/* Emergency Type */}
+          <div className="space-y-2">
+            <Label htmlFor="emergencyType-desktop">Emergency Type</Label>
+            <Select
+              value={emergencyType}
+              onValueChange={handleEmergencyTypeChange}
+            >
+              <SelectTrigger id="emergencyType-desktop">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Types</SelectItem>
+                <SelectItem value="ACCIDENT">Accident</SelectItem>
+                <SelectItem value="CARDIAC">Cardiac</SelectItem>
+                <SelectItem value="STROKE">Stroke</SelectItem>
+                <SelectItem value="PREGNANCY">Pregnancy</SelectItem>
+                <SelectItem value="TRAUMA">Trauma</SelectItem>
+                <SelectItem value="BREATHING_PROBLEM">
+                  Breathing Problem
+                </SelectItem>
+                <SelectItem value="OTHER">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Priority */}
+          <div className="space-y-2">
+            <Label htmlFor="priority-desktop">Priority</Label>
+            <Select value={priority} onValueChange={handlePriorityChange}>
+              <SelectTrigger id="priority-desktop">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Priorities</SelectItem>
+                <SelectItem value="LOW">Low</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="HIGH">High</SelectItem>
+                <SelectItem value="CRITICAL">Critical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort By */}
+          <div className="space-y-2">
+            <Label htmlFor="sortBy-desktop">Sort By</Label>
+            <Select value={sortBy} onValueChange={handleSortChange}>
+              <SelectTrigger id="sortBy-desktop">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dispatchedAt">Dispatch Date</SelectItem>
+                <SelectItem value="acceptedAt">Accepted Date</SelectItem>
+                <SelectItem value="emergency.priority">Priority</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort Order */}
+          <div className="space-y-2">
+            <Label htmlFor="sortOrder-desktop">Order</Label>
+            <Select value={sortOrder} onValueChange={handleSortOrderChange}>
+              <SelectTrigger id="sortOrder-desktop">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Newest First</SelectItem>
+                <SelectItem value="asc">Oldest First</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Search Input */}
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="search">Search</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="search"
+                placeholder="Search by patient name, phone..."
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                type="search"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Search */}
+        <div className="space-y-2 sm:hidden">
+          <Label htmlFor="search-mobile" className="text-xs">
+            Search
+          </Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="search-mobile"
+              placeholder="Search requests..."
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              type="search"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      {isLoading && (
+        <div className="flex justify-center rounded-lg border p-12">
+          <Spinner className="h-8 w-8" />
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-6 text-center text-sm text-destructive">
+          Failed to load dispatch requests. Please try again.
+        </div>
+      )}
+
+      {!isLoading && !error && (
+        <>
+          <DispatchTable dispatches={dispatches} />
+
+          {meta && meta.totalPages > 0 && (
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground text-center sm:text-left">
+                Showing {dispatches.length} of {meta.total} results
+              </p>
+
+              <TablePagination
+                page={page}
+                totalPages={meta.totalPages}
+                handlePageChange={setPage}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

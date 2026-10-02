@@ -9,11 +9,13 @@ import {
   assignDriverToAmbulance,
   driverStatusUpdate,
   getDriverProfile,
+  getDispatchableDrivers,
 } from "@/api/driver.api";
 import type {
   DriverQueryParams,
   AssignDriverPayload,
   ApproveDriverPayload,
+  DispatchableDriversQueryParams,
 } from "@/types/driver.type";
 import { toast } from "@/components/ui/toast";
 import {
@@ -167,3 +169,14 @@ export function useGetDriverProfile() {
     retry: false,
   });
 }
+
+export function useGetDispatchableDrivers(
+  params: DispatchableDriversQueryParams,
+) {
+  return useQuery({
+    queryKey: ["dispatchable-drivers", params],
+    queryFn: () => getDispatchableDrivers(params),
+  });
+}
+
+

@@ -7,6 +7,8 @@ import type {
   ApplyDriverPayload,
   ApproveDriverPayload,
   DutyStatusResponse,
+  DispatchableDriversQueryParams,
+  DispatchableDriver,
 } from "@/types/driver.type";
 
 export function getAllDrivers(params?: DriverQueryParams) {
@@ -97,4 +99,11 @@ export function getDriverProfile() {
   return apiClient<{ data: DutyStatusResponse }>("/driver/me/profile");
 }
 
-
+export function getDispatchableDrivers(params: DispatchableDriversQueryParams) {
+  return apiClient<ApiResponse<DispatchableDriver[]>>(
+    "/driver/dispatchable-drivers",
+    {
+      params,
+    },
+  );
+}

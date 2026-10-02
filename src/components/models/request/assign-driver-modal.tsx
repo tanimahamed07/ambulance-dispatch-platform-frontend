@@ -46,7 +46,7 @@ function DriverCard({
     >
       <div className="flex items-start gap-3">
         <RadioGroupItem value={driver.id} id={driver.id} className="mt-1" />
-        
+
         <div className="flex-1 space-y-2">
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -55,9 +55,13 @@ function DriverCard({
                 className="font-medium cursor-pointer flex items-center gap-2"
               >
                 {driver.user.name}
-                {isSelected && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                {isSelected && (
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                )}
               </label>
-              <p className="text-sm text-muted-foreground">{driver.user.email}</p>
+              <p className="text-sm text-muted-foreground">
+                {driver.user.email}
+              </p>
             </div>
             <Badge variant={driver.isAvailable ? "default" : "secondary"}>
               {driver.isAvailable ? "Available" : "Unavailable"}
@@ -113,7 +117,7 @@ export function AssignDriverModal({
 
   const handleAssign = () => {
     if (!selectedDriverId) return;
-    
+
     assignDriver(
       { driverId: selectedDriverId },
       {
@@ -122,7 +126,7 @@ export function AssignDriverModal({
           setSelectedDriverId(null);
           setSearchTerm("");
         },
-      }
+      },
     );
   };
 
@@ -174,7 +178,10 @@ export function AssignDriverModal({
             )}
 
             {!isLoading && drivers.length > 0 && (
-              <RadioGroup value={selectedDriverId || ""} onValueChange={setSelectedDriverId}>
+              <RadioGroup
+                value={selectedDriverId || ""}
+                onValueChange={setSelectedDriverId}
+              >
                 <div className="space-y-3">
                   {drivers.map((driver) => (
                     <DriverCard

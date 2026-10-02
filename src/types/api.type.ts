@@ -17,5 +17,6 @@ export interface ApiResponse<T> {
   statusCode: number;
   message: string;
   data: T;
-  // meta: Meta; <- এখান থেকে সরিয়ে দিন, কারণ meta টি data এর ভেতরে থাকে
+  meta?: Meta; // meta: Meta; <- এখান থেকে সরিয়ে দিন, কারণ meta টি data এর ভেতরে থাকে
 }
+

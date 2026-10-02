@@ -303,7 +303,7 @@ export function DriverApplicationDetailsModal({
                 )}
                 <Row
                   label="Rejected At"
-                  value={fmtDateTime(driver.rejectedAt)}
+                  value={fmtDateTime(driver?.rejectedAt ? driver.rejectedAt : "_")}
                 />
               </Section>
             )}
