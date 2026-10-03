@@ -8,6 +8,7 @@ import {
   Settings,
   Users,
   UserCheck,
+  Hospital,
 } from "lucide-react";
 import type { SidebarItems } from "@/types";
 
@@ -22,6 +23,11 @@ export const adminRoutes: SidebarItems = [
     href: "/admin/ambulances",
     label: "Ambulance Management",
     icon: Ambulance,
+  },
+  {
+    href: "/admin/hospitals",
+    label: "Hospital Management",
+    icon: Hospital,
   },
   { href: "/admin/dispatch", label: "Dispatch Board", icon: Radar },
   { href: "/admin/trips", label: "Active Trips", icon: Navigation },

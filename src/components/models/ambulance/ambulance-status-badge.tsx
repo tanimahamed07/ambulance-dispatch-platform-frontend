@@ -3,11 +3,15 @@ import type { AmbulanceStatus } from "@/types/ambulence.type";
 
 const STATUS_CONFIG: Record<
   AmbulanceStatus,
-  { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
+  {
+    label: string;
+    variant: "default" | "secondary" | "destructive" | "outline";
+  }
 > = {
   AVAILABLE: { label: "Available", variant: "default" },
   ASSIGNED: { label: "Assigned", variant: "secondary" },
   EN_ROUTE: { label: "En Route", variant: "secondary" },
+  ON_TRIP: { label: "On Trip", variant: "secondary" },
   OFFLINE: { label: "Offline", variant: "outline" },
   MAINTENANCE: { label: "Maintenance", variant: "destructive" },
 };

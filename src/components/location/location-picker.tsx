@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   MapContainer,
   Marker,
@@ -9,8 +9,11 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import L from "leaflet";
+import { Search } from "lucide-react";
 
 import "leaflet/dist/leaflet.css";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type LocationPickerProps = {
   latitude: number;
@@ -48,6 +51,24 @@ async function getAddress(latitude: number, longitude: number) {
     return data.display_name || "";
   } catch {
     return "";
+  }
+}
+
+async function searchLocation(query: string) {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&limit=5`,
+    );
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    return data.map((item: any) => ({
+      name: item.display_name,
+      latitude: parseFloat(item.lat),
+      longitude: parseFloat(item.lon),
+    }));
+  } catch {
+    return [];
   }
 }
 
@@ -91,9 +112,79 @@ export default function LocationPicker({
   onLocationChange,
 }: LocationPickerProps) {
   const hasLocation = latitude !== 0 && longitude !== 0;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<
+    { name: string; latitude: number; longitude: number }[]
+  >([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    setIsSearching(true);
+    const results = await searchLocation(searchQuery);
+    setSearchResults(results);
+    setIsSearching(false);
+
+    // First result automatically select kore dibo
+    if (results.length > 0) {
+      const first = results[0];
+      onLocationChange(first.latitude, first.longitude, first.name);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   return (
     <div className="space-y-2">
+      {/* Search Input */}
+      <div className="flex gap-2">
+        <Input
+          type="text"
+          placeholder="Search hospital by name or address..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          onClick={handleSearch}
+          disabled={isSearching || !searchQuery.trim()}
+          size="icon"
+        >
+          <Search className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Search Results Dropdown */}
+      {searchResults.length > 0 && (
+        <div className="rounded-md border bg-background p-2 space-y-1 max-h-40 overflow-y-auto">
+          {searchResults.map((result, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => {
+                onLocationChange(
+                  result.latitude,
+                  result.longitude,
+                  result.name,
+                );
+                setSearchResults([]);
+                setSearchQuery("");
+              }}
+              className="w-full text-left text-sm p-2 rounded hover:bg-accent transition-colors"
+            >
+              {result.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="overflow-hidden rounded-xl border bg-muted">
         <MapContainer
           center={[latitude || DHAKA.latitude, longitude || DHAKA.longitude]}

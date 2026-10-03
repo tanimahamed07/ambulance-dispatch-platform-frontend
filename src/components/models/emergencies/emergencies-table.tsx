@@ -79,15 +79,11 @@ export default function EmergenciesTable({
           <TableBody>
             {emergencies.map((emergency) => {
               const type = EMERGENCY_TYPE_LABELS[emergency.emergencyType];
-              const emergencyWithDispatch = emergency as Emergency & {
+              const { dispatch } = emergency as Emergency & {
                 dispatch?: {
-                  ambulance?: {
-                    ambulanceNumber: string;
-                    status: string;
-                  };
+                  status: string;
                 };
               };
-              const dispatch = emergencyWithDispatch.dispatch;
 
               return (
                 <TableRow key={emergency.id}>
@@ -111,14 +107,11 @@ export default function EmergenciesTable({
                   </TableCell>
 
                   <TableCell>
-                    {dispatch?.ambulance ? (
+                    {dispatch ? (
                       <div className="space-y-1">
-                        <p className="text-sm font-medium">
-                          {dispatch.ambulance.ambulanceNumber}
-                        </p>
-                        <Badge variant="outline" className="text-xs">
-                          {dispatch.ambulance.status}
-                        </Badge>
+                        <p className="font-medium">{dispatch.status}</p>
+
+                        <Badge variant="outline">{dispatch.status}</Badge>
                       </div>
                     ) : (
                       <span className="text-sm text-muted-foreground">
