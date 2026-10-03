@@ -44,6 +44,7 @@ const STATUS_CONFIG: Record<
 > = {
   PENDING: { label: "Pending", variant: "secondary" },
   ASSIGNED: { label: "Assigned", variant: "outline" },
+  DISPATCHED: { label: "Dispatched", variant: "default" },
   EN_ROUTE: { label: "En Route", variant: "default" },
   PICKED_UP: { label: "Picked Up", variant: "default" },
   IN_PROGRESS: { label: "In Progress", variant: "default" },
@@ -89,13 +90,13 @@ export default function DispatcherEmergenciesTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[280px]">Patient</TableHead>
-                <TableHead className="w-[130px]">Contact</TableHead>
-                <TableHead className="w-[140px]">Emergency Type</TableHead>
-                <TableHead className="w-[100px]">Priority</TableHead>
-                <TableHead className="w-[120px]">Status</TableHead>
-                <TableHead className="w-[130px]">Requested</TableHead>
-                <TableHead className="text-right w-[100px]">Actions</TableHead>
+                <TableHead className="w-70">Patient</TableHead>
+                <TableHead className="w-32.5">Contact</TableHead>
+                <TableHead className="w-35">Emergency Type</TableHead>
+                <TableHead className="w-25">Priority</TableHead>
+                <TableHead className="w-30">Status</TableHead>
+                <TableHead className="w-30">Requested</TableHead>
+                <TableHead className="text-right w-25">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -106,9 +107,9 @@ export default function DispatcherEmergenciesTable({
 
                 return (
                   <TableRow key={emergency.id}>
-                    <TableCell className="max-w-[280px]">
+                    <TableCell className="max-w-70">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 font-medium text-primary">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-medium text-primary">
                           {emergency.patientName.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">

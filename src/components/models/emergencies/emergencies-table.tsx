@@ -28,6 +28,7 @@ const EMERGENCY_TYPE_LABELS: Record<
   PREGNANCY: { label: "Pregnancy", icon: "🤰" },
   TRAUMA: { label: "Trauma", icon: "🩹" },
   BREATHING_PROBLEM: { label: "Breathing", icon: "🫁" },
+  STROKE: { label: "Stroke", icon: "🧠" },
   OTHER: { label: "Other", icon: "🏥" },
 };
 
@@ -49,10 +50,6 @@ export default function EmergenciesTable({
   emergencies: Emergency[];
   basePath?: string;
 }) {
-  const [selectedEmergency, setSelectedEmergency] = useState<Emergency | null>(
-    null,
-  );
-
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -74,7 +71,6 @@ export default function EmergenciesTable({
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Ambulance</TableHead>
-              <TableHead>Pickup</TableHead>
               <TableHead>Requested</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -83,13 +79,15 @@ export default function EmergenciesTable({
           <TableBody>
             {emergencies.map((emergency) => {
               const type = EMERGENCY_TYPE_LABELS[emergency.emergencyType];
-              const { dispatch } = emergency as Emergency & {
+              const emergencyWithDispatch = emergency as Emergency & {
                 dispatch?: {
-                  ambulance: { ambulanceNumber: string };
-                  driver: { user: { name: string } };
-                  status: string;
+                  ambulance?: {
+                    ambulanceNumber: string;
+                    status: string;
+                  };
                 };
               };
+              const dispatch = emergencyWithDispatch.dispatch;
 
               return (
                 <TableRow key={emergency.id}>
@@ -113,27 +111,20 @@ export default function EmergenciesTable({
                   </TableCell>
 
                   <TableCell>
-                    {dispatch ? (
+                    {dispatch?.ambulance ? (
                       <div className="space-y-1">
-                        <p className="font-medium">
+                        <p className="text-sm font-medium">
                           {dispatch.ambulance.ambulanceNumber}
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                          {dispatch.driver.user.name}
-                        </p>
-                        <Badge variant="outline">{dispatch.status}</Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {dispatch.ambulance.status}
+                        </Badge>
                       </div>
                     ) : (
                       <span className="text-sm text-muted-foreground">
-                        Not assigned
+                        Not Assigned
                       </span>
                     )}
-                  </TableCell>
-
-                  <TableCell className="max-w-xs whitespace-normal">
-                    <p className="line-clamp-2 text-sm">
-                      {emergency.pickupAddress}
-                    </p>
                   </TableCell>
 
                   <TableCell className="whitespace-nowrap text-sm text-muted-foreground">

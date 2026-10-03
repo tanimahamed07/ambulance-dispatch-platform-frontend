@@ -22,6 +22,7 @@ export type Priority = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
 export type EmergencyStatus =
   | "PENDING"
   | "ASSIGNED"
+  | "DISPATCHED"
   | "EN_ROUTE"
   | "PICKED_UP"
   | "IN_PROGRESS"

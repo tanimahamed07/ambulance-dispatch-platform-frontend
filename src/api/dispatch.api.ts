@@ -15,6 +15,8 @@ export function getMyDispatch(params?: MyDispatchParams) {
   );
 }
 
+
+
 export function getDispatchDetails(id: string) {
   return apiClient<ApiResponse<DispatchDetailResponse>>(`/dispatch/${id}`);
 }
@@ -30,3 +32,5 @@ export function rejectDispatch(id: string) {
     method: "PATCH",
   });
 }
+
+

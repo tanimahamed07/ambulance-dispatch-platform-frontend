@@ -16,31 +16,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import TablePagination from "@/components/ui/table-pagination";
-import DispatchTable from "@/components/models/dispatch/dispatch-table";
+import MyTripsTable from "@/components/models/trip/my-trips-table";
 
-import { useGetMyDispatches } from "@/hooks/dispatch.hooks";
+import { useGetMyTrips } from "@/hooks/trip.hooks";
 import useDebounce from "@/hooks/debounce.hook";
-import type { MyDispatchParams } from "@/types/dispatch.type";
+import type { IQuery } from "@/types";
 import type {
-  DispatchStatus,
+  TripStatus,
   EmergencyType,
   Priority,
 } from "@/types/emergency.type";
 
 const LIMIT = 10;
 
-const STATUS_TABS: { value: DispatchStatus | "ALL"; label: string }[] = [
-  { value: "ALL", label: "All Requests" },
-  { value: "PENDING", label: "Pending" },
-  { value: "ACCEPTED", label: "Accepted" },
-  { value: "REJECTED", label: "Rejected" },
+const STATUS_TABS: { value: TripStatus | "ALL"; label: string }[] = [
+  { value: "ALL", label: "All Trips" },
+  { value: "DISPATCHED", label: "Dispatched" },
+  { value: "EN_ROUTE", label: "En Route" },
+  { value: "PICKED_UP", label: "Picked Up" },
+  { value: "AT_HOSPITAL", label: "At Hospital" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CANCELLED", label: "Cancelled" },
 ];
 
-export default function DriverDispatchesPage() {
+export default function MyTripPage() {
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState<DispatchStatus | "ALL">("PENDING");
+  const [status, setStatus] = useState<TripStatus | "ALL">("ALL");
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<string>("dispatchedAt");
+  const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [emergencyType, setEmergencyType] = useState<EmergencyType | "ALL">(
     "ALL",
@@ -49,7 +52,7 @@ export default function DriverDispatchesPage() {
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const params: MyDispatchParams = {
+  const params: IQuery = {
     page,
     limit: LIMIT,
     sortBy,
@@ -62,12 +65,12 @@ export default function DriverDispatchesPage() {
   if (priority !== "ALL") params.priority = priority;
   if (debouncedSearchTerm) params.searchTerm = debouncedSearchTerm;
 
-  const { data: response, isLoading, error } = useGetMyDispatches(params);
+  const { data: response, isLoading, error } = useGetMyTrips(params);
 
-  const dispatches = response?.data?.data ?? [];
+  const trips = response?.data?.data ?? [];
   const meta = response?.data?.meta;
 
-  const handleStatusChange = (value: DispatchStatus | "ALL" | null) => {
+  const handleStatusChange = (value: TripStatus | "ALL" | null) => {
     if (value === null) return;
     setStatus(value);
     setPage(1);
@@ -107,16 +110,14 @@ export default function DriverDispatchesPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Assigned Requests
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">My Trips</h1>
           <p className="text-sm text-muted-foreground">
-            Manage your assigned dispatch requests
+            View and manage all your trips
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{meta?.total ?? 0} Total Requests</Badge>
+          <Badge variant="secondary">{meta?.total ?? 0} Total Trips</Badge>
         </div>
       </div>
 
@@ -146,7 +147,7 @@ export default function DriverDispatchesPage() {
             onValueChange={handleStatusChange}
             className="w-full"
           >
-            <TabsList className="grid h-auto w-full max-w-2xl grid-cols-4">
+            <TabsList className="grid h-auto w-full max-w-5xl grid-cols-7">
               {STATUS_TABS.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value}>
                   {tab.label}
@@ -217,9 +218,8 @@ export default function DriverDispatchesPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="dispatchedAt">Dispatch Date</SelectItem>
-                <SelectItem value="acceptedAt">Accepted Date</SelectItem>
-                <SelectItem value="emergency.priority">Priority</SelectItem>
+                <SelectItem value="createdAt">Start Date</SelectItem>
+                <SelectItem value="status">Trip Status</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -293,9 +293,8 @@ export default function DriverDispatchesPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="dispatchedAt">Dispatch Date</SelectItem>
-                <SelectItem value="acceptedAt">Accepted Date</SelectItem>
-                <SelectItem value="emergency.priority">Priority</SelectItem>
+                <SelectItem value="createdAt">Start Date</SelectItem>
+                <SelectItem value="status">Trip Status</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -340,7 +339,7 @@ export default function DriverDispatchesPage() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="search-mobile"
-              placeholder="Search requests..."
+              placeholder="Search trips..."
               className="pl-9"
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
@@ -359,18 +358,18 @@ export default function DriverDispatchesPage() {
 
       {error && (
         <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-6 text-center text-sm text-destructive">
-          Failed to load dispatch requests. Please try again.
+          Failed to load trips. Please try again.
         </div>
       )}
 
       {!isLoading && !error && (
         <>
-          <DispatchTable dispatches={dispatches} />
+          <MyTripsTable trips={trips} />
 
           {meta && meta.totalPages > 0 && (
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground text-center sm:text-left">
-                Showing {dispatches.length} of {meta.total} results
+                Showing {trips.length} of {meta.total} results
               </p>
 
               <TablePagination

@@ -205,8 +205,8 @@ export function DriverApplicationDetailsModal({
               <div className="flex items-center gap-3 mb-2">
                 {driver.user.profileUrl ? (
                   <img
-                    src={driver.user.profileUrl}
-                    alt={driver.user.name}
+                    src={driver?.user?.profileUrl}
+                    alt={driver?.user?.name}
                     className="h-12 w-12 rounded-full object-cover"
                   />
                 ) : (
@@ -303,7 +303,9 @@ export function DriverApplicationDetailsModal({
                 )}
                 <Row
                   label="Rejected At"
-                  value={fmtDateTime(driver?.rejectedAt ? driver.rejectedAt : "_")}
+                  value={fmtDateTime(
+                    driver?.rejectedAt ? driver.rejectedAt : "_",
+                  )}
                 />
               </Section>
             )}
