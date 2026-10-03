@@ -4,7 +4,6 @@ import {
   CreateHospitalPayload,
   Hospital,
   HospitalQueryParams,
-  IQuery,
   PaginatedResponse,
 } from "@/types";
 
@@ -50,3 +49,5 @@ export function updateHospitalStatus(
     body: { status },
   });
 }
+
+

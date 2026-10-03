@@ -7,3 +7,4 @@ export * from "./api.type";
 export * from "./ambulence.type";
 export * from "./dispatch.type";
 export * from "./hospital.type"
+export * from "./trip.type"

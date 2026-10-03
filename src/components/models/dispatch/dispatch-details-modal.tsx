@@ -139,8 +139,8 @@ export function DispatchDetailsModal({
         });
         setIsAccepting(false);
         onOpenChange(false);
-        // Redirect to active trip page
-        router.push("/driver/active-trip");
+        // Redirect to my trips page
+        router.push("/driver/my-trip");
       },
       onError: (error: any) => {
         toast.add({

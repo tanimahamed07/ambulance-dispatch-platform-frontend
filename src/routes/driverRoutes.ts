@@ -2,7 +2,7 @@ import {
   Ambulance,
   LayoutDashboard,
   ClipboardList,
-  Navigation,
+  MapPin,
   History,
 } from "lucide-react";
 import type { SidebarItems } from "@/types";
@@ -20,9 +20,9 @@ export const driverRoutes: SidebarItems = [
     icon: ClipboardList,
   },
   {
-    href: "/driver/active-trip",
-    label: "Active Trip",
-    icon: Navigation,
+    href: "/driver/my-trip",
+    label: "My Trips",
+    icon: MapPin,
   },
   {
     href: "/driver/history",

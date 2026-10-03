@@ -332,35 +332,6 @@ export default function CreateHospitalForm({
         </form.Field>
       </FieldGroup>
 
-      {/* Address */}
-      <form.Field name="address">
-        {(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && !field.state.meta.isValid;
-
-          return (
-            <div className="space-y-2">
-              <Label htmlFor={field.name}>Address</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id={field.name}
-                  placeholder="e.g., 123 Main St, Dhaka"
-                  className="pl-9"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  disabled={isPending}
-                />
-              </div>
-              {isInvalid && (
-                <FieldError>{field.state.meta.errors?.join(", ")}</FieldError>
-              )}
-            </div>
-          );
-        }}
-      </form.Field>
-
       {/* Map Location Picker */}
       <form.Field name="latitude">
         {(latitudeField) => (
@@ -370,11 +341,12 @@ export default function CreateHospitalForm({
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <Label className="text-sm font-medium">
-                      Hospital Location{" "}
+                      Hospital Location & Address{" "}
                       <span className="text-destructive">*</span>
                     </Label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Select the exact location on the map.
+                      Select location on the map. Address will be set
+                      automatically.
                     </p>
                   </div>
 
@@ -418,7 +390,7 @@ export default function CreateHospitalForm({
                     <div className="rounded-lg border bg-muted/30 p-3">
                       <div className="flex items-start gap-2">
                         <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex-1">
                           <p className="text-sm font-medium">
                             Location Selected
                           </p>
@@ -427,6 +399,16 @@ export default function CreateHospitalForm({
                             <br />
                             Longitude: {longitudeField.state.value.toFixed(6)}
                           </p>
+                          {form.state.values.address && (
+                            <div className="mt-2 pt-2 border-t">
+                              <p className="text-xs font-medium text-muted-foreground">
+                                Address:
+                              </p>
+                              <p className="text-sm mt-1">
+                                {form.state.values.address}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

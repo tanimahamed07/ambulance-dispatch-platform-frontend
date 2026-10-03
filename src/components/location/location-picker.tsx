@@ -164,9 +164,9 @@ export default function LocationPicker({
       {/* Search Results Dropdown */}
       {searchResults.length > 0 && (
         <div className="rounded-md border bg-background p-2 space-y-1 max-h-40 overflow-y-auto">
-          {searchResults.map((result, index) => (
+          {searchResults.map((result) => (
             <button
-              key={index}
+              key={`${result.latitude}-${result.longitude}-${result.name}`}
               type="button"
               onClick={() => {
                 onLocationChange(

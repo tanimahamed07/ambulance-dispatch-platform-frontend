@@ -38,7 +38,7 @@ const STATUS_TABS: { value: DispatchStatus | "ALL"; label: string }[] = [
 
 export default function DriverDispatchesPage() {
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState<DispatchStatus | "ALL">("PENDING");
+  const [status, setStatus] = useState<DispatchStatus | "ALL">("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<string>("dispatchedAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");

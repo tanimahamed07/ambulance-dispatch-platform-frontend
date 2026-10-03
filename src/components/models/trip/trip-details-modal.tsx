@@ -14,10 +14,12 @@ import {
   Phone,
   Navigation,
   Package,
+  CheckCircle,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -38,7 +40,12 @@ import {
   useGetMyTripDetails,
   useMarkTripEnRoute,
   useMarkTripPickedUp,
+  useSelectHospital,
+  useMarkHospitalArrival,
+  useCompleteTrip,
+  useCalculateTripFare,
 } from "@/hooks/trip.hooks";
+import { useGetHospitals } from "@/hooks/hospital.hooks";
 import type {
   Priority,
   TripStatus,
@@ -123,6 +130,9 @@ export function TripDetailsModal({
   onOpenChange,
 }: TripDetailsModalProps) {
   const [selectedAction, setSelectedAction] = useState<string>("");
+  const [selectedHospitalId, setSelectedHospitalId] = useState<string>("");
+  const [distanceKm, setDistanceKm] = useState<string>("");
+  const [showCompleteTripForm, setShowCompleteTripForm] = useState(false);
 
   const {
     data: response,
@@ -130,12 +140,36 @@ export function TripDetailsModal({
     error,
   } = useGetMyTripDetails(tripId, isOpen);
 
+  // Get all hospitals for selection
+  const { data: hospitalsResponse } = useGetHospitals({
+    page: 1,
+    limit: 100,
+    status: "ACTIVE",
+    emergencyAvailable: true,
+  });
+
+  // Calculate fare when distance changes
+  const distanceValue = parseFloat(distanceKm) || 0;
+  const { data: fareResponse } = useCalculateTripFare(
+    tripId,
+    distanceValue,
+    showCompleteTripForm && distanceValue >= 0.1,
+  );
+
   const { mutate: markEnRoute, isPending: isMarkingEnRoute } =
     useMarkTripEnRoute();
   const { mutate: markPickedUp, isPending: isMarkingPickedUp } =
     useMarkTripPickedUp();
+  const { mutate: selectHospital, isPending: isSelectingHospital } =
+    useSelectHospital();
+  const { mutate: markHospitalArrival, isPending: isMarkingHospitalArrival } =
+    useMarkHospitalArrival();
+  const { mutate: completeTrip, isPending: isCompletingTrip } =
+    useCompleteTrip();
 
   const trip = response?.data;
+  const hospitals = hospitalsResponse?.data?.data || [];
+
   const statusConfig = trip ? TRIP_STATUS_CONFIG[trip.status] : null;
   const priorityConfig = trip?.emergency.priority
     ? PRIORITY_CONFIG[trip.emergency.priority]
@@ -193,6 +227,89 @@ export function TripDetailsModal({
     }
   };
 
+  const handleHospitalSelect = () => {
+    if (!tripId || !selectedHospitalId) return;
+
+    selectHospital(
+      { tripId, hospitalId: selectedHospitalId },
+      {
+        onSuccess: () => {
+          toast.add({
+            type: "success",
+            title: "Success",
+            description: "Hospital selected successfully",
+          });
+          setSelectedHospitalId("");
+        },
+        onError: (error: any) => {
+          toast.add({
+            type: "error",
+            title: "Error",
+            description: error?.message || "Failed to select hospital",
+          });
+        },
+      },
+    );
+  };
+
+  const handleMarkHospitalArrival = () => {
+    if (!tripId) return;
+
+    markHospitalArrival(tripId, {
+      onSuccess: () => {
+        toast.add({
+          type: "success",
+          title: "Success",
+          description: "Marked arrival at hospital",
+        });
+      },
+      onError: (error: any) => {
+        toast.add({
+          type: "error",
+          title: "Error",
+          description: error?.message || "Failed to mark hospital arrival",
+        });
+      },
+    });
+  };
+
+  const handleCompleteTrip = () => {
+    if (!tripId || !distanceKm) return;
+
+    const distance = parseFloat(distanceKm);
+    if (distance < 0.1 || distance > 500) {
+      toast.add({
+        type: "error",
+        title: "Invalid Distance",
+        description: "Distance must be between 0.1 and 500 km",
+      });
+      return;
+    }
+
+    completeTrip(
+      { tripId, distanceKm: distance },
+      {
+        onSuccess: () => {
+          toast.add({
+            type: "success",
+            title: "Trip Completed",
+            description: "Trip has been completed successfully",
+          });
+          setShowCompleteTripForm(false);
+          setDistanceKm("");
+          onOpenChange(false);
+        },
+        onError: (error: any) => {
+          toast.add({
+            type: "error",
+            title: "Error",
+            description: error?.message || "Failed to complete trip",
+          });
+        },
+      },
+    );
+  };
+
   const getAvailableActions = () => {
     if (!trip) return [];
 
@@ -220,7 +337,17 @@ export function TripDetailsModal({
   };
 
   const availableActions = getAvailableActions();
-  const isUpdating = isMarkingEnRoute || isMarkingPickedUp;
+  const isUpdating =
+    isMarkingEnRoute ||
+    isMarkingPickedUp ||
+    isSelectingHospital ||
+    isMarkingHospitalArrival ||
+    isCompletingTrip;
+
+  const showHospitalSelection = trip?.status === "PICKED_UP" && !trip.hospital;
+  const showHospitalArrivalButton =
+    trip?.status === "PICKED_UP" && !!trip.hospital;
+  const showCompleteTripButton = trip?.status === "AT_HOSPITAL";
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -294,6 +421,174 @@ export function TripDetailsModal({
                     <Loader2 className="h-3 w-3 animate-spin" />
                     Updating trip status...
                   </p>
+                )}
+              </div>
+            )}
+
+            {/* Hospital Selection */}
+            {showHospitalSelection && (
+              <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4 space-y-3">
+                <Label
+                  htmlFor="hospital-select"
+                  className="text-sm font-medium block"
+                >
+                  Select Hospital
+                </Label>
+                <Select
+                  value={selectedHospitalId}
+                  onValueChange={setSelectedHospitalId}
+                  disabled={isSelectingHospital}
+                >
+                  <SelectTrigger id="hospital-select" className="w-full">
+                    <SelectValue placeholder="Choose a hospital...">
+                      {selectedHospitalId && hospitals.length > 0 && (
+                        <span className="flex items-center gap-2">
+                          <Hospital className="h-4 w-4" />
+                          {hospitals.find((h) => h.id === selectedHospitalId)
+                            ?.name || "Choose a hospital..."}
+                        </span>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {hospitals.map((hospital) => (
+                      <SelectItem key={hospital.id} value={hospital.id}>
+                        <span className="flex items-center gap-2">
+                          <Hospital className="h-4 w-4" />
+                          {hospital.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={handleHospitalSelect}
+                  disabled={!selectedHospitalId || isSelectingHospital}
+                  className="w-full"
+                  size="sm"
+                >
+                  {isSelectingHospital && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Confirm Hospital Selection
+                </Button>
+              </div>
+            )}
+
+            {/* Hospital Arrival Button */}
+            {showHospitalArrivalButton && (
+              <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-4">
+                <Button
+                  onClick={handleMarkHospitalArrival}
+                  disabled={isMarkingHospitalArrival}
+                  className="w-full"
+                  variant="default"
+                >
+                  {isMarkingHospitalArrival && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Mark Arrival at Hospital
+                </Button>
+              </div>
+            )}
+
+            {/* Complete Trip Section */}
+            {showCompleteTripButton && (
+              <div className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-4 space-y-3">
+                {!showCompleteTripForm ? (
+                  <Button
+                    onClick={() => setShowCompleteTripForm(true)}
+                    className="w-full"
+                    variant="default"
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Complete Trip
+                  </Button>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="distance" className="text-sm font-medium">
+                        Trip Distance (km)
+                      </Label>
+                      <Input
+                        id="distance"
+                        type="number"
+                        step="0.1"
+                        min="0.1"
+                        max="500"
+                        placeholder="Enter distance in kilometers"
+                        value={distanceKm}
+                        onChange={(e) => setDistanceKm(e.target.value)}
+                        disabled={isCompletingTrip}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Enter the total distance traveled (0.1 - 500 km)
+                      </p>
+                    </div>
+
+                    {fareResponse?.data && distanceValue >= 0.1 && (
+                      <div className="rounded-lg border bg-muted/50 p-3 space-y-2">
+                        <p className="text-sm font-medium">Fare Calculation</p>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Base Fare:
+                            </span>
+                            <span className="font-medium">
+                              ৳{fareResponse.data.baseFare}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Distance: {fareResponse.data.distanceKm} km × ৳
+                              {fareResponse.data.perKmRate}/km
+                            </span>
+                            <span className="font-medium">
+                              ৳
+                              {fareResponse.data.distanceKm *
+                                fareResponse.data.perKmRate}
+                            </span>
+                          </div>
+                          <div className="flex justify-between pt-2 border-t">
+                            <span className="font-medium">Total Fare:</span>
+                            <span className="text-lg font-bold text-primary">
+                              ৳{fareResponse.data.calculatedFare}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          setShowCompleteTripForm(false);
+                          setDistanceKm("");
+                        }}
+                        variant="outline"
+                        className="flex-1"
+                        disabled={isCompletingTrip}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleCompleteTrip}
+                        disabled={
+                          !distanceKm ||
+                          distanceValue < 0.1 ||
+                          distanceValue > 500 ||
+                          isCompletingTrip
+                        }
+                        className="flex-1"
+                      >
+                        {isCompletingTrip && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Confirm & Complete
+                      </Button>
+                    </div>
+                  </>
                 )}
               </div>
             )}
