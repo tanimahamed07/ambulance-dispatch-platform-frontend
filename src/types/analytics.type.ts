@@ -25,3 +25,23 @@ export interface AdminDashboardAnalytics {
     completedPayments: number;
   };
 }
+
+export interface DispatcherDashboardAnalytics {
+  emergencies: {
+    total: number;
+    pending: number;
+    assigned: number;
+    completed: number;
+  };
+  dispatches: {
+    total: number;
+    pending: number;
+    accepted: number;
+    completed: number;
+  };
+  resources: {
+    availableAmbulances: number;
+    availableDrivers: number;
+    dispatchableDrivers: number;
+  };
+}
