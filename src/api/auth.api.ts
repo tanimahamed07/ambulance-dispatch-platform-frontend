@@ -51,3 +51,13 @@ export function userLogout() {
 export function googleOAuth(payload: { idToken: string }) {
   return apiClient("/auth/google", { method: "POST", body: payload });
 }
+
+export function uploadProfileImage(file: File) {
+  const formData = new FormData();
+  formData.append("profileImage", file);
+
+  return apiClient<{ data: UserProfile }>("/user/profile-image", {
+    method: "PATCH",
+    body: formData,
+  });
+}
