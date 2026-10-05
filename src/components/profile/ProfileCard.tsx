@@ -1,10 +1,12 @@
 "use client";
 
+import { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import { useGetUserProfile } from "@/hooks";
+import { useGetUserProfile, useUploadProfileImage } from "@/hooks";
 import type { UserProfile } from "@/types";
+import { toast } from "@/components/ui/toast";
 import {
   Mail,
   Calendar,
@@ -19,10 +21,71 @@ import {
   CreditCard,
   CalendarDays,
   Award,
+  Camera,
 } from "lucide-react";
 
 export default function ProfileCard() {
   const { data, isLoading, error } = useGetUserProfile();
+  const uploadMutation = useUploadProfileImage();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      toast.add({
+        title: "Invalid file type",
+        description: "Please upload a JPEG, PNG, or WebP image.",
+        type: "error",
+      });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.add({
+        title: "File too large",
+        description: "Please upload an image smaller than 5MB.",
+        type: "error",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      await uploadMutation.mutateAsync(file);
+      toast.add({
+        title: "Success",
+        description: "Profile image uploaded successfully!",
+        type: "success",
+      });
+    } catch (error: any) {
+      toast.add({
+        title: "Upload failed",
+        description:
+          error?.message || "Failed to upload profile image. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsUploading(false);
+      // Reset the input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -129,7 +192,7 @@ export default function ProfileCard() {
         <CardContent className="-mt-16 space-y-6 pb-8 sm:-mt-20">
           {/* Avatar and Name Section */}
           <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left">
-            <div className="relative">
+            <div className="relative group">
               <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-2xl border-4 border-background bg-gradient-to-br from-primary/20 to-primary/5 shadow-xl">
                 {profile.profileUrl ? (
                   <img
@@ -141,6 +204,37 @@ export default function ProfileCard() {
                   <User className="h-16 w-16 text-primary" />
                 )}
               </div>
+
+              {/* Upload Button Overlay */}
+              <button
+                type="button"
+                onClick={handleImageClick}
+                disabled={isUploading}
+                className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/60 opacity-0 transition-opacity hover:opacity-100 focus:opacity-100 disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Upload profile image"
+              >
+                {isUploading ? (
+                  <Spinner className="h-8 w-8 text-white" />
+                ) : (
+                  <div className="text-center">
+                    <Camera className="mx-auto h-8 w-8 text-white" />
+                    <span className="mt-1 block text-xs font-medium text-white">
+                      Change Photo
+                    </span>
+                  </div>
+                )}
+              </button>
+
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                onChange={handleFileChange}
+                className="hidden"
+                aria-label="Select profile image file"
+              />
+
               {profile.emailVerified && (
                 <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full border-4 border-background bg-emerald-500 shadow-lg">
                   <CheckCircle2 className="h-5 w-5 text-white" />

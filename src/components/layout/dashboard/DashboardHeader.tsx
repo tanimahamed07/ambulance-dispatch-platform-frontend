@@ -146,7 +146,10 @@ export function DashboardHeader({
             }
           >
             <Avatar className="size-8">
-              <AvatarImage src={undefined} alt={user?.name} />
+              <AvatarImage
+                src={user?.profileUrl || undefined}
+                alt={user?.name}
+              />
               <AvatarFallback className="bg-primary/10 font-semibold text-primary">
                 {getInitials(user?.name)}
               </AvatarFallback>

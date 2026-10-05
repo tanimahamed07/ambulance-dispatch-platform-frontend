@@ -157,7 +157,10 @@ export default function Navbar() {
                   }
                 >
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={undefined} alt={user?.name || "User"} />
+                    <AvatarImage
+                      src={user?.profileUrl || undefined}
+                      alt={user?.name || "User"}
+                    />
                     <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
                       {getInitials(user?.name)}
                     </AvatarFallback>
@@ -281,7 +284,7 @@ export default function Navbar() {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
                         <AvatarImage
-                          src={undefined}
+                          src={user?.profileUrl || undefined}
                           alt={user?.name || "User"}
                         />
                         <AvatarFallback className="bg-primary/10 font-semibold text-primary">

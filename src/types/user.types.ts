@@ -17,6 +17,7 @@ export interface AuthUser {
   name: string;
   email: string;
   role: UserRole;
+  profileUrl?: string;
 }
 
 export interface CallerProfile {
