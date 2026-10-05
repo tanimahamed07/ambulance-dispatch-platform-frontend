@@ -3,13 +3,62 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, XCircle, Ban, AlertCircle, Loader2, Receipt } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  Ban,
+  AlertTriangle,
+  Loader2,
+  Receipt,
+  ArrowLeft,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const REDIRECT_SECONDS = 10;
+
+type Tone = {
+  icon: typeof CheckCircle2;
+  iconColor: string;
+  iconBg: string;
+  ring: string;
+  topBar: string;
+};
+
+const TONES: Record<"success" | "failure" | "cancel" | "error", Tone> = {
+  success: {
+    icon: CheckCircle2,
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconBg: "bg-emerald-100 dark:bg-emerald-950/50",
+    ring: "ring-emerald-200/70 dark:ring-emerald-900/50",
+    topBar: "bg-emerald-500",
+  },
+  failure: {
+    icon: XCircle,
+    iconColor: "text-red-600 dark:text-red-400",
+    iconBg: "bg-red-100 dark:bg-red-950/50",
+    ring: "ring-red-200/70 dark:ring-red-900/50",
+    topBar: "bg-red-500",
+  },
+  cancel: {
+    icon: Ban,
+    iconColor: "text-amber-600 dark:text-amber-400",
+    iconBg: "bg-amber-100 dark:bg-amber-950/50",
+    ring: "ring-amber-200/70 dark:ring-amber-900/50",
+    topBar: "bg-amber-500",
+  },
+  error: {
+    icon: AlertTriangle,
+    iconColor: "text-orange-600 dark:text-orange-400",
+    iconBg: "bg-orange-100 dark:bg-orange-950/50",
+    ring: "ring-orange-200/70 dark:ring-orange-900/50",
+    topBar: "bg-orange-500",
+  },
+};
 
 function PaymentStatusContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(REDIRECT_SECONDS);
 
   const paymentStatus = searchParams.get("payment");
   const tripId = searchParams.get("tripId");
@@ -23,111 +72,102 @@ function PaymentStatusContent() {
       return () => clearTimeout(timer);
     }
 
-    if (paymentStatus === "success" && countdown === 0 && tripId) {
-      router.push(`/caller/my-emergencies/${tripId}`);
+    if (paymentStatus === "success" && countdown === 0) {
+      // Redirect to payment history to see the payment details
+      router.push("/caller/payment-history");
     }
-  }, [countdown, paymentStatus, tripId, router]);
+  }, [countdown, paymentStatus, router]);
+
+  const backButton = (
+    <Button className="w-full">
+      <Link href="/caller/my-emergencies">Back to my emergencies</Link>
+    </Button>
+  );
+
+  const supportButton = (
+    <Button variant="outline" className="w-full">
+      <Link href="/contact">Contact support</Link>
+    </Button>
+  );
 
   const getStatusConfig = () => {
     switch (paymentStatus) {
       case "success":
         return {
-          icon: CheckCircle,
-          iconColor: "text-green-600",
-          bgColor: "bg-green-50",
-          borderColor: "border-green-200",
-          title: "Payment Successful! 🎉",
+          tone: TONES.success,
+          title: "Payment successful",
           message:
-            "Your payment has been processed successfully. An invoice has been sent to your email address.",
-          description: "Check your email inbox for the payment receipt PDF.",
-          action: tripId ? (
-            <div className="space-y-3">
-              <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-                <div className="flex items-center gap-2 text-sm text-green-800">
-                  <Receipt className="h-4 w-4" />
-                  <span className="font-medium">
-                    Invoice sent to your email
-                  </span>
-                </div>
+            "Your payment has been processed. A receipt PDF is on its way to your email.",
+          action: (
+            <div className="space-y-4">
+              <div className="flex items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300">
+                <Receipt className="h-4 w-4" aria-hidden="true" />
+                Invoice sent to your email
               </div>
-              <p className="text-sm text-muted-foreground">
-                Redirecting to trip details in {countdown} seconds...
-              </p>
-              <Link href={`/caller/my-emergencies/${tripId}`}>
-                <Button className="w-full">View Trip Details Now</Button>
-              </Link>
+
+              <div className="space-y-2">
+                <div
+                  className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                  aria-hidden="true"
+                >
+                  <div
+                    className="h-full rounded-full bg-emerald-500 transition-[width] duration-1000 ease-linear"
+                    style={{
+                      width: `${(countdown / REDIRECT_SECONDS) * 100}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Redirecting to payment history in {countdown}s
+                </p>
+              </div>
+
+              <Button className="w-full">
+                <Link href="/caller/payment-history">
+                  View payment history now
+                </Link>
+              </Button>
             </div>
-          ) : (
-            <Link href="/caller/my-emergencies">
-              <Button className="w-full">View My Emergencies</Button>
-            </Link>
           ),
         };
 
       case "failure":
         return {
-          icon: XCircle,
-          iconColor: "text-red-600",
-          bgColor: "bg-red-50",
-          borderColor: "border-red-200",
-          title: "Payment Failed",
+          tone: TONES.failure,
+          title: "Payment failed",
           message:
-            "Your payment could not be processed. This might be due to insufficient balance, network issues, or payment cancellation.",
-          description: "Please try again or contact bKash support if the issue persists.",
+            "We couldn't process your payment. This can happen with insufficient balance, a network issue, or a cancelled approval.",
+          hint: "Try again, or contact support if it keeps failing.",
           action: (
             <div className="space-y-3">
-              <Link href="/caller/my-emergencies">
-                <Button className="w-full">Back to My Emergencies</Button>
-              </Link>
-              <Link href="/contact">
-                <Button variant="outline" className="w-full">
-                  Contact Support
-                </Button>
-              </Link>
+              {backButton}
+              {supportButton}
             </div>
           ),
         };
 
       case "cancel":
         return {
-          icon: Ban,
-          iconColor: "text-orange-600",
-          bgColor: "bg-orange-50",
-          borderColor: "border-orange-200",
-          title: "Payment Cancelled",
+          tone: TONES.cancel,
+          title: "Payment cancelled",
           message:
-            "You have cancelled the payment process. No amount has been deducted from your account.",
-          description: "You can retry the payment whenever you're ready.",
-          action: (
-            <div className="space-y-3">
-              <Link href="/caller/my-emergencies">
-                <Button className="w-full">Back to My Emergencies</Button>
-              </Link>
-            </div>
-          ),
+            "You cancelled the payment. Nothing was deducted from your account.",
+          hint: "You can retry whenever you're ready.",
+          action: <div className="space-y-3">{backButton}</div>,
         };
 
       case "error":
       default:
         return {
-          icon: AlertCircle,
-          iconColor: "text-yellow-600",
-          bgColor: "bg-yellow-50",
-          borderColor: "border-yellow-200",
-          title: "Something Went Wrong",
+          tone: TONES.error,
+          title: "Something went wrong",
           message:
-            "An unexpected error occurred during payment processing. Please contact support if this continues.",
-          description: "Your payment may not have been processed.",
+            "An unexpected error occurred while processing your payment.",
+          hint: "Your payment may not have gone through. Contact support if this continues.",
           action: (
             <div className="space-y-3">
-              <Link href="/caller/my-emergencies">
-                <Button className="w-full">Back to My Emergencies</Button>
-              </Link>
-              <Link href="/contact">
-                <Button variant="outline" className="w-full">
-                  Contact Support
-                </Button>
-              </Link>
+              {backButton}
+              {supportButton}
             </div>
           ),
         };
@@ -135,43 +175,62 @@ function PaymentStatusContent() {
   };
 
   const config = getStatusConfig();
-  const Icon = config.icon;
+  const { tone } = config;
+  const Icon = tone.icon;
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <div
-          className={`rounded-lg border ${config.borderColor} p-8 text-center shadow-sm`}
-        >
-          <div className="mb-6 flex justify-center">
-            <div
-              className={`flex h-20 w-20 items-center justify-center rounded-full ${config.bgColor}`}
-            >
-              <Icon className={`h-12 w-12 ${config.iconColor}`} />
+        <div className="relative overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-sm">
+          <div className={`h-1 w-full ${tone.topBar}`} aria-hidden="true" />
+
+          <div
+            className="px-6 pb-8 pt-10 text-center sm:px-8"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="mb-6 flex justify-center">
+              <div
+                className={`flex h-20 w-20 items-center justify-center rounded-full ring-8 ${tone.iconBg} ${tone.ring}`}
+              >
+                <Icon
+                  className={`h-10 w-10 ${tone.iconColor}`}
+                  aria-hidden="true"
+                />
+              </div>
             </div>
+
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {config.title}
+            </h1>
+
+            <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-muted-foreground">
+              {config.message}
+            </p>
+
+            {config.hint && (
+              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-foreground/80">
+                {config.hint}
+              </p>
+            )}
+
+            {tripId && (
+              <p className="mt-5 inline-flex items-center rounded-md bg-muted px-2.5 py-1 font-mono text-xs text-muted-foreground">
+                Trip ID: {tripId}
+              </p>
+            )}
+
+            <div className="mt-8">{config.action}</div>
           </div>
-
-          <h1 className="mb-3 text-2xl font-semibold tracking-tight">
-            {config.title}
-          </h1>
-
-          <p className="mb-2 text-sm leading-6 text-foreground">
-            {config.message}
-          </p>
-
-          <p className="mb-6 text-xs text-muted-foreground">
-            {config.description}
-          </p>
-
-          {config.action}
         </div>
 
         <div className="mt-6 text-center">
           <Link
             href="/caller"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            Go to Dashboard
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            Go to dashboard
           </Link>
         </div>
       </div>

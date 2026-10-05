@@ -22,26 +22,49 @@ function CallbackContent() {
       return;
     }
 
-    // Get backend URL - use env variable or extract from API_BASE_URL
-    const backendUrl =
-      process.env.NEXT_PUBLIC_API_URL ||
-      process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api/v1", "") ||
-      "https://ambulance-dispatch-platform.vercel.app";
-
-    // Build backend callback URL with all params
-    const backendCallbackUrl = new URL(`${backendUrl}/payment/callback`);
-    backendCallbackUrl.searchParams.append("paymentID", paymentID);
-    backendCallbackUrl.searchParams.append("status", status);
-    if (signature) {
-      backendCallbackUrl.searchParams.append("signature", signature);
-    }
-    if (apiVersion) {
-      backendCallbackUrl.searchParams.append("apiVersion", apiVersion);
+    // Handle failure and cancel status directly without calling backend
+    if (status === "failure") {
+      router.push("/caller/payment-status?payment=failure");
+      return;
     }
 
-    // Redirect to backend callback endpoint
-    // Backend will process payment and redirect to final status page
-    window.location.href = backendCallbackUrl.toString();
+    if (status === "cancel") {
+      router.push("/caller/payment-status?payment=cancel");
+      return;
+    }
+
+    // Only process success status with backend
+    if (status === "success") {
+      // Get backend URL - use env variable or extract from API_BASE_URL
+      const backendUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api/v1", "") ||
+        "https://ambulance-dispatch-platform.vercel.app";
+
+      // Build backend callback URL with all params
+      const backendCallbackUrl = new URL(`${backendUrl}/payment/callback`);
+      backendCallbackUrl.searchParams.append("paymentID", paymentID);
+      backendCallbackUrl.searchParams.append("status", status);
+      if (signature) {
+        backendCallbackUrl.searchParams.append("signature", signature);
+      }
+      if (apiVersion) {
+        backendCallbackUrl.searchParams.append("apiVersion", apiVersion);
+      }
+
+      // Redirect to backend callback endpoint for success verification
+      // Backend will process payment and redirect to final status page
+      try {
+        window.location.href = backendCallbackUrl.toString();
+      } catch (error) {
+        // If redirect fails, show error status
+        router.push("/caller/payment-status?payment=error");
+      }
+      return;
+    }
+
+    // Unknown status - redirect to error
+    router.push("/caller/payment-status?payment=error");
   }, [searchParams, router]);
 
   return (

@@ -123,10 +123,72 @@ export default function PaymentDetailsModal({
   isOpen,
   onOpenChange,
 }: PaymentDetailsModalProps) {
+  const router = useRouter();
   const { data: response, isLoading, error } = useGetPaymentByTripId(tripId);
+  const { mutate: retryPayment, isPending: isRetrying } = useRetryPayment();
 
   const payment = response?.data;
   const trip = payment?.trip;
+
+  const handleRetryPayment = () => {
+    if (!tripId) return;
+
+    retryPayment(
+      { tripId },
+      {
+        onSuccess: (response) => {
+          const paymentUrl = response.data?.paymentUrl;
+          if (paymentUrl) {
+            toast.add({
+              type: "success",
+              title: "Redirecting to Payment",
+              description: "Please complete your payment on bKash",
+            });
+            // Redirect to bKash payment page
+            window.location.href = paymentUrl;
+          } else {
+            toast.add({
+              type: "error",
+              title: "Error",
+              description: "Payment URL not received",
+            });
+          }
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            "Failed to retry payment";
+
+          if (
+            errorMessage.includes("Already Pending") ||
+            errorMessage.includes("already pending")
+          ) {
+            toast.add({
+              type: "warning",
+              title: "Payment Already Pending",
+              description:
+                "You already have a pending payment. Please check your bKash app or contact support.",
+            });
+          } else {
+            toast.add({
+              type: "error",
+              title: "Payment Retry Failed",
+              description: errorMessage,
+            });
+          }
+        },
+      },
+    );
+  };
+
+  const canRetry =
+    payment &&
+    trip?.status === "COMPLETED" &&
+    trip.fare &&
+    (payment.status === "FAILED" ||
+      payment.status === "CANCELLED" ||
+      payment.status === "UNPAID");
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -296,16 +358,35 @@ export default function PaymentDetailsModal({
             )}
 
             {/* Actions */}
-            {payment.status === "COMPLETED" && trip && (
-              <Button
-                className="w-full"
-                onClick={() => {
-                  window.open(`/caller/my-emergencies/${trip.id}`, "_blank");
-                }}
-              >
-                View Full Trip Details
-              </Button>
-            )}
+            <div className="space-y-2">
+              {canRetry && (
+                <Button
+                  className="w-full"
+                  onClick={handleRetryPayment}
+                  disabled={isRetrying}
+                >
+                  {isRetrying ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Retry Payment"
+                  )}
+                </Button>
+              )}
+
+              {payment?.status === "PENDING" && (
+                <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-3">
+                  <p className="text-sm font-medium text-yellow-700 dark:text-yellow-500">
+                    ⚠️ Payment Pending
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Please complete your pending payment from your bKash app.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </DialogContent>
