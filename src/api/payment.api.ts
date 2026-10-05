@@ -100,3 +100,9 @@ export function retryPayment(payload: RetryPaymentPayload) {
     body: payload,
   });
 }
+
+export function getDriverPayments(params?: PaymentQueryParams) {
+  return apiClient<PaymentListResponse>("/payment/driver-payments", {
+    params,
+  });
+}

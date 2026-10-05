@@ -16,9 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import TablePagination from "@/components/ui/table-pagination";
-import PaymentsTable from "@/components/models/payment/payments-table";
+import DriverPaymentsTable from "@/components/models/payments/driver-payments-table";
 
-import { useMyPayments } from "@/hooks/payment.hooks";
+import { useDriverPayments } from "@/hooks/payment.hooks";
 import useDebounce from "@/hooks/debounce.hook";
 import type { Payment } from "@/api/payment.api";
 
@@ -33,7 +33,7 @@ const STATUS_TABS: { value: Payment["status"] | "ALL"; label: string }[] = [
   { value: "CANCELLED", label: "Cancelled" },
 ];
 
-export default function PaymentHistoryPage() {
+export default function DriverPaymentHistoryPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<Payment["status"] | "ALL">("ALL");
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,12 +49,10 @@ export default function PaymentHistoryPage() {
   if (status !== "ALL") params.status = status;
   if (debouncedSearchTerm) params.searchTerm = debouncedSearchTerm;
 
-  const { data: response, isLoading, error } = useMyPayments(params);
+  const { data: response, isLoading, error } = useDriverPayments(params);
 
   const payments = response?.data ?? [];
   const meta = response?.meta;
-
-  console.log("++++++++>", payments);
 
   const handleStatusChange = (value: Payment["status"] | "ALL" | null) => {
     if (value === null) return;
@@ -151,7 +149,7 @@ export default function PaymentHistoryPage() {
 
       {!isLoading && !error && (
         <>
-          <PaymentsTable payments={payments} />
+          <DriverPaymentsTable payments={payments} />
 
           {meta && meta.totalPages > 0 && (
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

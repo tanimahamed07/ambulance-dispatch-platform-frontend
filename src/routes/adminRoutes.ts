@@ -1,11 +1,6 @@
 import {
   Ambulance,
-  CreditCard,
   LayoutDashboard,
-  LifeBuoy,
-  Navigation,
-  Radar,
-  Settings,
   Users,
   UserCheck,
   Hospital,
@@ -29,10 +24,5 @@ export const adminRoutes: SidebarItems = [
     label: "Hospital Management",
     icon: Hospital,
   },
-  { href: "/admin/dispatch", label: "Dispatch Board", icon: Radar },
-  { href: "/admin/trips", label: "Active Trips", icon: Navigation },
   { href: "/admin/drivers", label: "Drivers", icon: Users },
-  { href: "/admin/payments", label: "Payments", icon: CreditCard },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
-  { href: "/admin/support", label: "Help & Support", icon: LifeBuoy },
 ];

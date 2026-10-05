@@ -125,7 +125,6 @@ export default function EmergenciesTable({
               <TableHead>Type</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Ambulance</TableHead>
               <TableHead>Requested</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -161,19 +160,6 @@ export default function EmergenciesTable({
                     <EmergencyStatusBadge status={emergency.status} />
                   </TableCell>
 
-                  <TableCell>
-                    {dispatch ? (
-                      <div className="space-y-1">
-                        <p className="font-medium">{dispatch.status}</p>
-
-                        <Badge variant="outline">{dispatch.status}</Badge>
-                      </div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">
-                        Not Assigned
-                      </span>
-                    )}
-                  </TableCell>
 
                   <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                     {formatDistanceToNow(new Date(emergency.createdAt), {

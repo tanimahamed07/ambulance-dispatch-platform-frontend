@@ -25,13 +25,8 @@ export const driverRoutes: SidebarItems = [
     icon: MapPin,
   },
   {
-    href: "/driver/history",
-    label: "Trip History",
+    href: "/driver/payment-history",
+    label: "Payment History",
     icon: History,
-  },
-  {
-    href: "/driver/ambulance",
-    label: "My Ambulance",
-    icon: Ambulance,
   },
 ];

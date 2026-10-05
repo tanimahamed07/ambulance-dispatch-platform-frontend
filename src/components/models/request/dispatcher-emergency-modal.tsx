@@ -148,7 +148,11 @@ export function DispatcherEmergencyModal({
 
   const canAssignDriver = emergency?.status === "PENDING" && !dispatch;
 
-  const availableDrivers: DispatchableDriver[] = driversData?.data || [];
+  const availableDrivers: DispatchableDriver[] = Array.isArray(
+    driversData?.data,
+  )
+    ? driversData.data
+    : [];
   const selectedDriver = availableDrivers.find(
     (d) => d.id === selectedDriverId,
   );
