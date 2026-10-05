@@ -8,7 +8,7 @@ export type AmbulanceStatus =
   | "ON_TRIP"
   | "MAINTENANCE";
 
-export interface Driver {
+export interface AmbulanceDriver {
   id: string;
   user: {
     name: string;
@@ -29,7 +29,7 @@ export interface Ambulance {
   status: AmbulanceStatus;
   currentLatitude: number | null;
   currentLongitude: number | null;
-  driver: Driver | null;
+  driver: AmbulanceDriver | null;
   isDeleted: boolean;
   deletedAt: string | null;
   createdAt: string;

@@ -101,7 +101,8 @@ export function CallerEmergencyModal({
     !!onPay &&
     trip?.status === "COMPLETED" &&
     !!trip.fare &&
-    (!payment || ["UNPAID", "FAILED", "CANCELLED"].includes(payment.status));
+    (!payment ||
+      ["UNPAID", "PENDING", "FAILED", "CANCELLED"].includes(payment.status));
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -232,7 +233,7 @@ export function CallerEmergencyModal({
             )}
 
             {/* Payment */}
-            {trip?.status === "COMPLETED" && (
+            {trip?.status === "COMPLETED" && trip.fare && (
               <Section title="Payment">
                 {payment ? (
                   <>
@@ -240,32 +241,77 @@ export function CallerEmergencyModal({
                       <span className="text-sm text-muted-foreground">
                         Status
                       </span>
-                      <Badge variant="outline">{payment.status}</Badge>
+                      <Badge
+                        variant={
+                          payment.status === "COMPLETED"
+                            ? "default"
+                            : payment.status === "PENDING"
+                              ? "secondary"
+                              : payment.status === "FAILED" ||
+                                  payment.status === "CANCELLED"
+                                ? "destructive"
+                                : "outline"
+                        }
+                      >
+                        {payment.status}
+                      </Badge>
                     </div>
                     <Row
                       label="Amount"
-                      value={`${payment.amount} ${payment.currency}`}
+                      value={`৳${payment.amount} ${payment.currency}`}
                     />
-                    <Row label="Transaction ID" value={payment.trxID} />
-                    <Row
-                      label="Paid at"
-                      value={fmt(payment.paymentExecuteTime)}
-                    />
-                    <Row label="Failure reason" value={payment.failureReason} />
+                    {payment.trxID && (
+                      <Row label="Transaction ID" value={payment.trxID} />
+                    )}
+                    {payment.paymentExecuteTime && (
+                      <Row
+                        label="Paid at"
+                        value={fmt(payment.paymentExecuteTime)}
+                      />
+                    )}
+                    {payment.failureReason && (
+                      <div className="pt-2 text-sm space-y-1">
+                        <p className="text-muted-foreground">Failure Reason:</p>
+                        <p className="text-destructive rounded-lg bg-destructive/10 p-2">
+                          {payment.failureReason}
+                        </p>
+                      </div>
+                    )}
                   </>
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Payment not started yet.
-                  </p>
+                  <div className="space-y-2">
+                    <Row label="Amount" value={`৳${trip.fare} BDT`} />
+                    <p className="text-sm text-muted-foreground">
+                      Payment not initiated yet.
+                    </p>
+                  </div>
                 )}
 
                 {canPay && (
-                  <Button
-                    className="mt-3 w-full"
-                    onClick={() => onPay?.(trip.id)}
-                  >
-                    {payment ? "Retry Payment" : "Pay Now"}
-                  </Button>
+                  <>
+                    {payment?.status === "PENDING" ? (
+                      <div className="mt-3 rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-3">
+                        <p className="text-sm font-medium text-yellow-700 dark:text-yellow-500">
+                          ⚠️ Payment Already Pending
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          You already have a pending payment for this trip.
+                          Please complete it from your bKash app or contact
+                          support.
+                        </p>
+                      </div>
+                    ) : (
+                      <Button
+                        className="mt-3 w-full"
+                        onClick={() => onPay?.(trip.id)}
+                      >
+                        {payment?.status === "FAILED" ||
+                        payment?.status === "CANCELLED"
+                          ? "Retry Payment"
+                          : "Pay Now"}
+                      </Button>
+                    )}
+                  </>
                 )}
               </Section>
             )}

@@ -180,7 +180,7 @@ export function AssignDriverModal({
             {!isLoading && drivers.length > 0 && (
               <RadioGroup
                 value={selectedDriverId || ""}
-                onValueChange={setSelectedDriverId}
+                onValueChange={(value) => setSelectedDriverId(value as string)}
               >
                 <div className="space-y-3">
                   {drivers.map((driver) => (

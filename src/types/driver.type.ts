@@ -47,7 +47,7 @@ export interface DriverQueryParams {
   email?: string;
   licenseNumber?: string;
   isAvailable?: string | boolean;
-  approvalStatus?: DriverApprovalStatus;
+  approvalStatus?: DriverApprovalStatus | "ALL";
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 }

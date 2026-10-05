@@ -1,6 +1,7 @@
 import {
   AlertCircle,
   Car,
+  CreditCard,
   LayoutDashboard,
   PhoneCall,
   Settings,
@@ -20,6 +21,11 @@ export const callerRoutes: SidebarItems = [
     href: `${prefix}/my-emergencies`,
     label: "My Emergencies",
     icon: PhoneCall,
+  },
+  {
+    href: `${prefix}/payment-history`,
+    label: "Payment History",
+    icon: CreditCard,
   },
   {
     href: `${prefix}/apply-driver`,

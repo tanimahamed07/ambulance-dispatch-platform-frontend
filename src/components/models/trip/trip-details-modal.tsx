@@ -181,8 +181,8 @@ export function TripDetailsModal({
   const canUpdateStatus =
     trip && !["COMPLETED", "CANCELLED"].includes(trip.status);
 
-  const handleStatusChange = (value: string) => {
-    if (!tripId) return;
+  const handleStatusChange = (value: string | null) => {
+    if (!tripId || !value) return;
 
     setSelectedAction(value);
 
@@ -436,7 +436,9 @@ export function TripDetailsModal({
                 </Label>
                 <Select
                   value={selectedHospitalId}
-                  onValueChange={setSelectedHospitalId}
+                  onValueChange={(value) =>
+                    value && setSelectedHospitalId(value)
+                  }
                   disabled={isSelectingHospital}
                 >
                   <SelectTrigger id="hospital-select" className="w-full">

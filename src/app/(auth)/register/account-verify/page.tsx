@@ -124,8 +124,11 @@ export default async function VerifyEmailPage() {
                 </p>
               </div>
 
-
+              <Suspense
+                fallback={<div className="text-center">Loading...</div>}
+              >
                 <VerifyAccountForm />
+              </Suspense>
 
               <div className="mt-6 flex justify-center">
                 <Link

@@ -5,6 +5,8 @@ const TYPE_CONFIG: Record<AmbulanceType, { label: string; icon: string }> = {
   AC: { label: "AC", icon: "❄️" },
   NON_AC: { label: "Non-AC", icon: "🌡️" },
   ICU: { label: "ICU", icon: "🏥" },
+  FREEZER: { label: "Freezer", icon: "🧊" },
+  AIR: { label: "Air", icon: "✈️" },
 };
 
 export default function AmbulanceTypeBadge({ type }: { type: AmbulanceType }) {

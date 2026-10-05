@@ -116,7 +116,11 @@ export default function ForgotPasswordPage() {
                 </p>
               </div>
 
-              <ForgotPasswordForm />
+              <Suspense
+                fallback={<div className="text-center">Loading...</div>}
+              >
+                <ForgotPasswordForm />
+              </Suspense>
 
               <div className="mt-6 flex justify-center">
                 <Link

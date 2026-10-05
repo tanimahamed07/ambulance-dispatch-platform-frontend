@@ -111,43 +111,6 @@ export function useDriverApplicationStatusUpdate() {
   });
 }
 
-export function useAssignDriverWithAmbulance() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: string;
-      payload: { driverId: string };
-    }) => assignDriverWithAmbulance(id, payload),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ambulances"] });
-    },
-  });
-}
-
-export function useUnAssignDriverWithAmbulance() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: string;
-      payload: { driverId: string };
-    }) => unassignDriverWithAmbulance(id, payload),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ambulances"] });
-      queryClient.invalidateQueries({ queryKey: ["drivers"] });
-    },
-  });
-}
-
 export function useDriverStatusUpdate() {
   const queryClient = useQueryClient();
 
@@ -178,5 +141,3 @@ export function useGetDispatchableDrivers(
     queryFn: () => getDispatchableDrivers(params),
   });
 }
-
-

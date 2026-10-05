@@ -14,10 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "@/components/ui/toast";
 import type { Emergency, EmergencyType } from "@/types/emergency.type";
 import EmergencyPriorityBadge from "./emergency-priority-badge";
 import EmergencyStatusBadge from "./emergency-status-badge";
 import { CallerEmergencyModal } from "./caller-emergency-modal";
+import { useInitiatePayment } from "@/hooks/payment.hooks";
 
 const EMERGENCY_TYPE_LABELS: Record<
   EmergencyType,
@@ -53,9 +55,62 @@ export default function EmergenciesTable({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
+  const { mutate: initiatePayment } = useInitiatePayment();
+
   const handleOpenDetails = (emergency: Emergency) => {
     setSelectedId(emergency.id);
     setIsOpen(true);
+  };
+
+  const handlePay = (tripId: string) => {
+    initiatePayment(
+      { tripId },
+      {
+        onSuccess: (response) => {
+          const paymentUrl = response.data?.paymentUrl;
+          if (paymentUrl) {
+            toast.add({
+              type: "success",
+              title: "Redirecting to Payment",
+              description: "Please complete your payment on bKash",
+            });
+            // Redirect to bKash payment page
+            window.location.href = paymentUrl;
+          } else {
+            toast.add({
+              type: "error",
+              title: "Error",
+              description: "Payment URL not received",
+            });
+          }
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            "Failed to initiate payment";
+
+          // Check if it's the "already pending" error
+          if (
+            errorMessage.includes("Already Have A Pending Payment") ||
+            errorMessage.includes("already have a pending payment")
+          ) {
+            toast.add({
+              type: "warning",
+              title: "Payment Already Pending",
+              description:
+                "You already have a pending payment. Please check your bKash app or contact support to complete the pending payment.",
+            });
+          } else {
+            toast.add({
+              type: "error",
+              title: "Payment Failed",
+              description: errorMessage,
+            });
+          }
+        },
+      },
+    );
   };
 
   if (emergencies.length === 0) return <EmptyState />;
@@ -148,6 +203,7 @@ export default function EmergenciesTable({
         emergencyId={selectedId}
         isOpen={isOpen}
         onOpenChange={setIsOpen}
+        onPay={handlePay}
       />
     </>
   );

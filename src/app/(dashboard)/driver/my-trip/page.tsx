@@ -53,8 +53,8 @@ export default function MyTripPage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const params: IQuery = {
-    page,
-    limit: LIMIT,
+    page: page.toString(),
+    limit: LIMIT.toString(),
     sortBy,
     sortOrder,
   };

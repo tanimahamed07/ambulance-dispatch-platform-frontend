@@ -17,6 +17,8 @@ export default function RoleGuard({ children, roles }: IProps) {
 
   const { data, isPending, isError } = useGetMe();
 
+  console.log("RoleGuard data:", data);
+
   const user = data?.data;
   const isAuthorized = !!user && roles.includes(user.role);
 
