@@ -1,6 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { format, formatDistanceToNow } from "date-fns";
 import { CheckCircle2, Circle, Loader2 } from "lucide-react";
 
@@ -13,8 +15,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/toast";
 
-import { useGetPaymentByTripId } from "@/hooks/payment.hooks";
+import { useGetPaymentByTripId, useRetryPayment } from "@/hooks/payment.hooks";
 import type { Payment, Trip } from "@/api/payment.api";
 
 const STATUS_CONFIG = {
