@@ -2,13 +2,31 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Ambulance, Menu, X, Phone, LogOut } from "lucide-react";
+import {
+  Ambulance,
+  Menu,
+  X,
+  Phone,
+  LogOut,
+  LayoutDashboard,
+} from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetMe, useLogout } from "@/hooks";
 import { toast } from "../ui/toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { getRoutesForRole } from "@/routes";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -17,32 +35,57 @@ const LINKS = [
   { href: "/about", label: "About" },
 ];
 
+const ROLE_LABELS = {
+  ADMIN: "Administrator",
+  DISPATCHER: "Dispatcher",
+  DRIVER: "Driver",
+  CALLER: "Caller",
+} as const;
+
+function getInitials(name?: string) {
+  if (!name) return "?";
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const { data, isLoading } = useGetMe();
-  const { mutate: logout } = useLogout();
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
   const queryClient = useQueryClient();
 
-  const isLoggedIn = !!data && !isLoading;
+  const user = data?.data;
+  const isLoggedIn = !!user && !isLoading;
+
+  const dashboardRoute = user ? getRoutesForRole(user.role)[0]?.href : "/";
+  const roleLabel = user?.role ? ROLE_LABELS[user.role] : undefined;
 
   const handleLogout = () => {
     logout(undefined, {
       onSuccess: () => {
         toast.add({
-          title: "Logged out",
-          description: "Logged out successfully",
+          title: "Logged out successfully",
+          description: "You have been logged out of your account",
           type: "success",
         });
 
         queryClient.removeQueries({ queryKey: ["user"] });
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         setOpen(false);
+        router.push("/login");
       },
       onError: () => {
         toast.add({
           title: "Logout failed",
-          description: "Something went wrong",
+          description: "Something went wrong. Please try again.",
           type: "error",
         });
       },
@@ -100,15 +143,60 @@ export default function Navbar() {
 
           {!isLoading &&
             (isLoggedIn ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                className="gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      className="relative h-9 w-9 rounded-full"
+                    />
+                  }
+                >
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={undefined} alt={user?.name || "User"} />
+                    <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                      {getInitials(user?.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {user?.name}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email}
+                        </p>
+                        {roleLabel && (
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {roleLabel}
+                          </p>
+                        )}
+                      </div>
+                    </DropdownMenuLabel>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => router.push(dashboardRoute)}
+                    className="cursor-pointer"
+                  >
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    variant="destructive"
+                    className="cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
                 <Button
@@ -182,18 +270,61 @@ export default function Navbar() {
           </div>
 
           {!isLoading && (
-            <div className="mt-4 flex gap-3">
+            <div className="mt-4 space-y-3">
               {isLoggedIn ? (
-                <Button
-                  variant="outline"
-                  className="w-full gap-2"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
-              ) : (
                 <>
+                  <div className="rounded-lg border border-border bg-muted/50 p-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={undefined}
+                          alt={user?.name || "User"}
+                        />
+                        <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+                          {getInitials(user?.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <p className="text-sm font-medium">{user?.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user?.email}
+                        </p>
+                        {roleLabel && (
+                          <p className="text-xs text-muted-foreground">
+                            {roleLabel}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1 gap-2"
+                      nativeButton={false}
+                      render={
+                        <Link
+                          href={dashboardRoute}
+                          onClick={() => setOpen(false)}
+                        />
+                      }
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 gap-2"
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      {isLoggingOut ? "..." : "Logout"}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex gap-3">
                   <Button
                     variant="outline"
                     className="w-full"
@@ -214,7 +345,7 @@ export default function Navbar() {
                   >
                     Sign up
                   </Button>
-                </>
+                </div>
               )}
             </div>
           )}

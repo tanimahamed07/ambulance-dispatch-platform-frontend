@@ -99,7 +99,10 @@ export function DashboardSidebar({
   const content = (
     <>
       {/* Brand */}
-      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-sidebar-border px-5">
+      <Link
+        href="/"
+        className="flex h-16 shrink-0 items-center gap-2.5 border-b border-sidebar-border px-5 transition-opacity hover:opacity-80"
+      >
         <span className="flex size-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
           <Ambulance className="size-5" />
         </span>
@@ -114,13 +117,16 @@ export function DashboardSidebar({
         <Button
           variant="ghost"
           size="icon-sm"
-          onClick={onClose}
+          onClick={(e) => {
+            e.preventDefault();
+            onClose();
+          }}
           aria-label="Close sidebar"
           className="ml-auto text-sidebar-foreground/70 lg:hidden"
         >
           <X className="size-4" />
         </Button>
-      </div>
+      </Link>
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
