@@ -13,6 +13,7 @@ export interface Driver {
   licensePublicId: string;
   licenseExpiry: string;
   nidNumber: string;
+  nidUrl?: string;
   contactNumber: string;
   address: string;
   approvalStatus: DriverApprovalStatus;
@@ -20,6 +21,7 @@ export interface Driver {
   rejectionReason?: RejectionReason | null;
   rejectionNote?: string | null;
   rejectedAt?: string | null;
+  approvedAt?: string | null;
   ambulanceId: string | null;
   createdAt: string;
   updatedAt: string;

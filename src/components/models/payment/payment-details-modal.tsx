@@ -18,7 +18,7 @@ import {
 import { toast } from "@/components/ui/toast";
 
 import { usePaymentByTripId, useRetryPayment } from "@/hooks/payment.hooks";
-import type { Payment, Trip } from "@/api/payment.api";
+import type { Payment, Trip } from "@/types/payment.type";
 
 const STATUS_CONFIG = {
   COMPLETED: {
@@ -124,7 +124,7 @@ export default function PaymentDetailsModal({
   onOpenChange,
 }: PaymentDetailsModalProps) {
   const router = useRouter();
-  const { data: response, isLoading, error } = usePaymentByTripId(tripId);
+  const { data: response, isLoading, error } = usePaymentByTripId(tripId || "");
   const { mutate: retryPayment, isPending: isRetrying } = useRetryPayment();
 
   const payment = response?.data;

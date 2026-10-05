@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Payment } from "@/api/payment.api";
+import type { Payment } from "@/types/payment.type";
 import PaymentDetailsModal from "../payment/payment-details-modal";
 
 const STATUS_CONFIG = {

@@ -5,10 +5,12 @@ import {
   getPaymentByTripId,
   initiatePayment,
   retryPayment,
-  type InitiatePaymentPayload,
-  type PaymentQueryParams,
-  type RetryPaymentPayload,
 } from "@/api/payment.api";
+import {
+  InitiatePaymentPayload,
+  PaymentQueryParams,
+  RetryPaymentPayload,
+} from "@/types/payment.type";
 
 export function useDriverPayments(params?: PaymentQueryParams) {
   return useQuery({

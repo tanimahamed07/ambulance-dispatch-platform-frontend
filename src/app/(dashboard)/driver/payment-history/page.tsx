@@ -20,7 +20,7 @@ import DriverPaymentsTable from "@/components/models/payments/driver-payments-ta
 
 import { useDriverPayments } from "@/hooks/payment.hooks";
 import useDebounce from "@/hooks/debounce.hook";
-import type { Payment } from "@/api/payment.api";
+import type { Payment } from "@/types/payment.type";
 
 const LIMIT = 10;
 

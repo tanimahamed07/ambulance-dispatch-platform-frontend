@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Payment } from "@/api/payment.api";
+import type { Payment } from "@/types/payment.type";
 import PaymentDetailsModal from "./payment-details-modal";
 
 const STATUS_CONFIG = {
@@ -66,11 +66,7 @@ function EmptyState() {
   );
 }
 
-export default function PaymentsTable({
-  payments,
-}: {
-  payments: Payment[];
-}) {
+export default function PaymentsTable({ payments }: { payments: Payment[] }) {
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -134,9 +130,12 @@ export default function PaymentsTable({
 
                   <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                     {payment.paymentCreateTime
-                      ? formatDistanceToNow(new Date(payment.paymentCreateTime), {
-                          addSuffix: true,
-                        })
+                      ? formatDistanceToNow(
+                          new Date(payment.paymentCreateTime),
+                          {
+                            addSuffix: true,
+                          },
+                        )
                       : formatDistanceToNow(new Date(payment.createdAt), {
                           addSuffix: true,
                         })}
