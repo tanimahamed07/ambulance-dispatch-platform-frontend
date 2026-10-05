@@ -3,6 +3,7 @@ import type {
   AdminDashboardAnalytics,
   DispatcherDashboardAnalytics,
   DriverDashboardAnalytics,
+  CallerDashboardAnalytics,
 } from "@/types";
 
 export function getAdminDashboard() {
@@ -17,4 +18,8 @@ export function getDispatcherDashboard() {
 
 export function getDriverDashboard() {
   return apiClient<{ data: DriverDashboardAnalytics }>("/analytics/driver");
+}
+
+export function getCallerDashboard() {
+  return apiClient<{ data: CallerDashboardAnalytics }>("/analytics/caller");
 }

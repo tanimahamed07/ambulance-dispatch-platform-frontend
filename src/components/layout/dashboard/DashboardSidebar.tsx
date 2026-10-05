@@ -76,15 +76,21 @@ export function DashboardSidebar({
   const handleLogout = () => {
     logout(undefined, {
       onSuccess: () => {
+        // Clear all local storage
+        localStorage.clear();
+        sessionStorage.clear();
+
         toast.add({
           title: "Logged out",
           description: "Logged out successfully",
           type: "success",
         });
 
-        queryClient.removeQueries({ queryKey: ["user"] });
         onClose();
         router.replace("/login");
+
+        // Force page reload to clear all state
+        router.refresh();
       },
       onError: () => {
         toast.add({

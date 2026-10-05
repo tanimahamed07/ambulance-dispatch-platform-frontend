@@ -73,3 +73,21 @@ export interface DriverDashboardAnalytics {
     completionRate: number;
   };
 }
+
+export interface CallerDashboardAnalytics {
+  emergencies: {
+    total: number;
+    pending: number;
+    completed: number;
+    cancelled: number;
+  };
+  trips: {
+    total: number;
+    completed: number;
+  };
+  payments: {
+    totalSpending: number;
+    completedPayments: number;
+    pendingPayments: number;
+  };
+}

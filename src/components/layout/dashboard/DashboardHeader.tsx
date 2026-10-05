@@ -65,14 +65,20 @@ export function DashboardHeader({
   const handleLogout = () => {
     logout(undefined, {
       onSuccess: () => {
+        // Clear all local storage
+        localStorage.clear();
+        sessionStorage.clear();
+
         toast.add({
           type: "success",
           title: "Logged out successfully",
           description: "You have been logged out of your account",
         });
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token");
+
         router.push("/login");
+
+        // Force page reload to clear all state
+        router.refresh();
       },
       onError: (error: any) => {
         toast.add({

@@ -70,17 +70,21 @@ export default function Navbar() {
   const handleLogout = () => {
     logout(undefined, {
       onSuccess: () => {
+        // Clear all local storage
+        localStorage.clear();
+        sessionStorage.clear();
+
         toast.add({
           title: "Logged out successfully",
           description: "You have been logged out of your account",
           type: "success",
         });
 
-        queryClient.removeQueries({ queryKey: ["user"] });
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token");
         setOpen(false);
         router.push("/login");
+
+        // Force page reload to clear all state
+        router.refresh();
       },
       onError: () => {
         toast.add({

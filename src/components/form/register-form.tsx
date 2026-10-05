@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { callerRegistrationSchema } from "@/validation";
 import { useRegistration } from "@/hooks";
 import { toast } from "../ui/toast";
-import { getErrorMessage } from "@/lib/get-error-message";
+import { Spinner } from "../ui/spinner";
+import GoogleLoginComponent from "../models/google-login/GoogleLogin";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -279,6 +280,7 @@ export default function RegisterForm() {
           disabled
           className="h-11 w-full font-medium shadow-sm"
         >
+          <Spinner />
           Creating Account...
         </Button>
       ) : (
@@ -286,6 +288,25 @@ export default function RegisterForm() {
           Create Account
         </Button>
       )}
+
+      {/* OR Divider */}
+      <div className="relative flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-border" />
+        </div>
+        <span className="relative bg-background px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Or continue with
+        </span>
+      </div>
+
+      {/* Google Login */}
+      <div className="flex justify-center">
+        <GoogleLoginComponent
+          onSuccess={() => {
+            router.push("/");
+          }}
+        />
+      </div>
     </form>
   );
 }

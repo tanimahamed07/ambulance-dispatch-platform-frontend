@@ -15,6 +15,7 @@ import { toast } from "../ui/toast";
 import { getErrorMessage } from "@/lib/get-error-message";
 import { FieldError, FieldGroup } from "../ui/field";
 import { Spinner } from "../ui/spinner";
+import GoogleLoginComponent from "../models/google-login/GoogleLogin";
 
 // Demo accounts data aligned with Roles (ADMIN, DISPATCHER, DRIVER, CALLER)
 const DEMO_ACCOUNTS = [
@@ -239,6 +240,25 @@ export default function LoginForm() {
           </Button>
         </FieldGroup>
       </form>
+
+      {/* OR Divider */}
+      <div className="relative flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-border" />
+        </div>
+        <span className="relative bg-background px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Or continue with
+        </span>
+      </div>
+
+      {/* Google Login */}
+      <div className="flex justify-center">
+        <GoogleLoginComponent
+          onSuccess={() => {
+            router.push("/");
+          }}
+        />
+      </div>
 
       {/* Demo Credentials Quick Fill Section */}
       <div className="space-y-3 pt-2">
