@@ -6,5 +6,6 @@ export * from "./emergency.type";
 export * from "./api.type";
 export * from "./ambulence.type";
 export * from "./dispatch.type";
-export * from "./hospital.type"
-export * from "./trip.type"
+export * from "./hospital.type";
+export * from "./trip.type";
+export * from "./analytics.type";
