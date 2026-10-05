@@ -6,6 +6,7 @@ import {
   googleOAuth,
   resendVerificationCode,
   resetPassword,
+  uploadProfileImage,
   userLogin,
   userLogout,
   verifyAccount,
@@ -100,6 +101,19 @@ export function useGoogleOAuth() {
     onSuccess: () => {
       // Invalidate and refetch user data after successful Google login
       queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+}
+
+export function useUploadProfileImage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: uploadProfileImage,
+    onSuccess: () => {
+      // Invalidate both user and userProfile queries after successful upload
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
     },
   });
 }
