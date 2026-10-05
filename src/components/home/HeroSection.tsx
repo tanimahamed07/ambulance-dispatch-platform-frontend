@@ -4,8 +4,11 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Ambulance, MapPin, ShieldCheck } from "lucide-react";
+import { useGetMe } from "@/hooks";
+import { getRoutesForRole } from "@/routes";
 
 const STEPS = [
   { label: "Request received", tone: "text-muted-foreground" },
@@ -30,6 +33,10 @@ const item = {
 export default function HeroSection() {
   const [elapsed, setElapsed] = useState(0);
   const [step, setStep] = useState(0);
+  const router = useRouter();
+
+  const { data, isLoading } = useGetMe();
+  const user = data?.data;
 
   useEffect(() => {
     const tick = setInterval(() => setElapsed((s) => s + 1), 1000);
@@ -45,6 +52,66 @@ export default function HeroSection() {
 
   const mm = String(Math.floor(elapsed / 60)).padStart(2, "0");
   const ss = String(elapsed % 60).padStart(2, "0");
+
+  // Get role-based routes
+  const getDashboardRoute = () => {
+    if (!user) return null;
+
+    const routes = getRoutesForRole(user.role);
+    return routes[0]?.href || "/";
+  };
+
+  const getEmergencyRequestRoute = () => {
+    if (!user) {
+      // If not logged in, go to login with callback URL
+      return `/login?callbackUrl=${encodeURIComponent("/caller/request")}`;
+    }
+
+    // Role-based emergency request routing
+    switch (user.role) {
+      case "CALLER":
+        return "/caller/request"; // Caller can request emergency
+      case "ADMIN":
+        return "/admin"; // Admin goes to dashboard
+      case "DISPATCHER":
+        return "/dispatcher/emergencies"; // Dispatcher views emergencies
+      case "DRIVER":
+        return "/driver/dispatches"; // Driver views dispatches
+      default:
+        return "/";
+    }
+  };
+
+  const getDriverApplicationRoute = () => {
+    if (!user) {
+      // If not logged in, go to login with callback URL
+      return `/login?callbackUrl=${encodeURIComponent("/caller/apply-driver")}`;
+    }
+
+    // Role-based driver application routing
+    switch (user.role) {
+      case "CALLER":
+        return "/caller/apply-driver"; // Caller can apply as driver
+      case "ADMIN":
+        return "/admin/driver-application"; // Admin views applications
+      case "DISPATCHER":
+        return "/dispatcher"; // Dispatcher goes to dashboard
+      case "DRIVER":
+        return "/driver"; // Already a driver, go to dashboard
+      default:
+        return "/caller/apply-driver";
+    }
+  };
+
+  const handleEmergencyClick = () => {
+    const route = getEmergencyRequestRoute();
+    router.push(route);
+  };
+
+  const handleDriverClick = () => {
+    const route = getDriverApplicationRoute();
+    router.push(route);
+  };
 
   return (
     <section className="bg-background text-foreground">
@@ -85,24 +152,75 @@ export default function HeroSection() {
           </motion.p>
 
           <motion.div variants={item} className="mt-6 flex flex-wrap gap-3">
-            <Button
-              size="default"
-              variant="destructive"
-              className="gap-2"
-              nativeButton={false}
-              render={<Link href="/caller/request-emergency" />}
-            >
-              <Ambulance className="h-4 w-4" />
-              Request an ambulance
-            </Button>
-            <Button
-              size="default"
-              variant="outline"
-              nativeButton={false}
-              render={<Link href="/become-a-driver" />}
-            >
-              Become a driver
-            </Button>
+            {/* Dynamic Emergency Request Button */}
+            {!isLoading && (
+              <>
+                {user ? (
+                  // If logged in, show role-based button
+                  <Button
+                    size="default"
+                    variant="destructive"
+                    className="gap-2"
+                    onClick={handleEmergencyClick}
+                  >
+                    <Ambulance className="h-4 w-4" />
+                    {user.role === "CALLER"
+                      ? "Request an ambulance"
+                      : user.role === "ADMIN"
+                        ? "Admin Dashboard"
+                        : user.role === "DISPATCHER"
+                          ? "View Emergencies"
+                          : "My Dispatches"}
+                  </Button>
+                ) : (
+                  // If not logged in, link to login with callback
+                  <Button
+                    size="default"
+                    variant="destructive"
+                    className="gap-2"
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href={`/login?callbackUrl=${encodeURIComponent("/caller/request")}`}
+                      />
+                    }
+                  >
+                    <Ambulance className="h-4 w-4" />
+                    Request an ambulance
+                  </Button>
+                )}
+
+                {/* Dynamic Driver Application Button */}
+                {user ? (
+                  <Button
+                    size="default"
+                    variant="outline"
+                    onClick={handleDriverClick}
+                  >
+                    {user.role === "CALLER"
+                      ? "Become a driver"
+                      : user.role === "ADMIN"
+                        ? "View Applications"
+                        : user.role === "DRIVER"
+                          ? "My Dashboard"
+                          : "Dispatcher Dashboard"}
+                  </Button>
+                ) : (
+                  <Button
+                    size="default"
+                    variant="outline"
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href={`/login?callbackUrl=${encodeURIComponent("/caller/apply-driver")}`}
+                      />
+                    }
+                  >
+                    Become a driver
+                  </Button>
+                )}
+              </>
+            )}
           </motion.div>
 
           <motion.div

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff, LockKeyhole, Mail, UserCheck } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,8 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const { mutate: login, isPending: loginPending } = useLogin();
 
@@ -72,7 +74,8 @@ export default function LoginForm() {
             type: "success",
           });
 
-          router.push("/");
+          // Redirect to callback URL or default to home
+          router.push(callbackUrl);
         },
 
         onError: (err) => {
@@ -253,11 +256,7 @@ export default function LoginForm() {
 
       {/* Google Login */}
       <div className="flex justify-center">
-        <GoogleLoginComponent
-          onSuccess={() => {
-            router.push("/");
-          }}
-        />
+        <GoogleLoginComponent />
       </div>
 
       {/* Demo Credentials Quick Fill Section */}

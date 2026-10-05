@@ -3,7 +3,7 @@
 import { toast } from "@/components/ui/toast";
 import { useGoogleOAuth } from "@/hooks";
 import { GoogleLogin } from "@react-oauth/google";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface GoogleLoginComponentProps {
   onSuccess?: () => void;
@@ -13,6 +13,8 @@ export default function GoogleLoginComponent({
   onSuccess,
 }: GoogleLoginComponentProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const { mutate: googleLogin, isPending } = useGoogleOAuth();
 
   const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
@@ -40,7 +42,8 @@ export default function GoogleLoginComponent({
           if (onSuccess) {
             onSuccess();
           } else {
-            router.push("/");
+            // Redirect to callback URL or default to home
+            router.push(callbackUrl);
           }
         },
         onError: (err: any) => {
