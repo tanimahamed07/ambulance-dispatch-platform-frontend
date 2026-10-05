@@ -1,6 +1,7 @@
 import apiClient from "@/lib/apiClient";
 import type {
   AuthUser,
+  UserProfile,
   CallerRegistrationPayload,
   forgotPasswordPayload,
   LoginPayload,
@@ -37,6 +38,10 @@ export function resetPassword(payload: resetPasswordPayload) {
 
 export function getMe() {
   return apiClient<{ data: AuthUser }>("/auth/me");
+}
+
+export function getUserProfile() {
+  return apiClient<{ data: UserProfile }>("/auth/me");
 }
 
 export function userLogout() {

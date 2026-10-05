@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Ambulance, ShieldCheck, Clock3, HeartPulse } from "lucide-react";
 
 import LoginForm from "@/components/form/login-form";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function LoginPage() {
   return (
@@ -111,7 +113,15 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              <LoginForm />
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center py-8">
+                    <Spinner />
+                  </div>
+                }
+              >
+                <LoginForm />
+              </Suspense>
 
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 Don&apos;t have an account?{" "}

@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Ambulance, ShieldCheck, Clock3, HeartPulse } from "lucide-react";
 
 import RegisterForm from "@/components/form/register-form";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function RegisterPage() {
   return (
@@ -112,7 +114,15 @@ export default function RegisterPage() {
                 </p>
               </div>
 
-              <RegisterForm />
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center py-8">
+                    <Spinner />
+                  </div>
+                }
+              >
+                <RegisterForm />
+              </Suspense>
 
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 Already have an account?{" "}

@@ -7,7 +7,6 @@ import Footer from "@/components/home/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import HowItWorks from "@/components/home/HowItWorks";
 import PaymentPricing from "@/components/home/PaymentPricing";
-import QuickEmergencyStrip from "@/components/home/QuickEmergencyStrip";
 import SafetyTrust from "@/components/home/SafetyTrust";
 import StatsCounters from "@/components/home/StatsCounters";
 import Testimonials from "@/components/home/Testimonials";
@@ -17,7 +16,6 @@ export default function HomePage() {
   return (
     <div>
       <HeroSection></HeroSection>
-      <QuickEmergencyStrip></QuickEmergencyStrip>
       <StatsCounters></StatsCounters>
       <HowItWorks></HowItWorks>
       <AmbulanceTypes></AmbulanceTypes>

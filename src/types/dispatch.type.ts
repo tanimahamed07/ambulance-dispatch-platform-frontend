@@ -6,9 +6,7 @@ import {
   Priority,
 } from "./emergency.type";
 
-
 // Existing Dispatch Types
-
 
 export interface MyDispatch {
   id: string;
@@ -65,9 +63,7 @@ export interface MyDispatchResponse {
   };
 }
 
-
-
-export interface UserProfile {
+export interface DispatchUserProfile {
   name: string;
   email: string;
   profileUrl?: string | null;
@@ -75,7 +71,7 @@ export interface UserProfile {
 
 export interface Caller {
   id?: string;
-  user: UserProfile;
+  user: DispatchUserProfile;
 }
 
 export interface EmergencyDetail {
@@ -94,7 +90,7 @@ export interface EmergencyDetail {
 
 export interface DriverDetail {
   id: string;
-  user: UserProfile;
+  user: DispatchUserProfile;
 }
 
 export interface AmbulanceDetail {

@@ -2,6 +2,7 @@ import {
   callerRegistration,
   forgotPassword,
   getMe,
+  getUserProfile,
   googleOAuth,
   resendVerificationCode,
   resetPassword,
@@ -60,6 +61,16 @@ export function useGetMe() {
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (previously cacheTime)
+  });
+}
+
+export function useGetUserProfile() {
+  return useQuery({
+    queryKey: ["userProfile"],
+    queryFn: getUserProfile,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 
