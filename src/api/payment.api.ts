@@ -5,6 +5,10 @@ export interface InitiatePaymentPayload {
   tripId: string;
 }
 
+export interface RetryPaymentPayload {
+  tripId: string;
+}
+
 export interface InitiatePaymentResponse {
   paymentUrl: string;
 }
@@ -57,6 +61,20 @@ export interface PaymentQueryParams extends IQuery {
   status?: "UNPAID" | "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED";
 }
 
+// Custom response type for payment list endpoint
+export interface PaymentListResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: Payment[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export function initiatePayment(payload: InitiatePaymentPayload) {
   return apiClient<ApiResponse<InitiatePaymentResponse>>("/payment/initiate", {
     method: "POST",
@@ -65,16 +83,20 @@ export function initiatePayment(payload: InitiatePaymentPayload) {
 }
 
 export function getAllMyPayments(params?: PaymentQueryParams) {
-  return apiClient<ApiResponse<PaginatedResponse<Payment>>>(
-    "/payment/my-payments",
-    {
-      params,
-    },
-  );
+  return apiClient<PaymentListResponse>("/payment/my-payments", {
+    params,
+  });
 }
 
 export function getPaymentByTripId(tripId: string) {
   return apiClient<ApiResponse<PaymentWithTrip>>(
     `/payment/my-payment/${tripId}`,
   );
+}
+
+export function retryPayment(payload: RetryPaymentPayload) {
+  return apiClient<ApiResponse<InitiatePaymentResponse>>("/payment/retry", {
+    method: "POST",
+    body: payload,
+  });
 }

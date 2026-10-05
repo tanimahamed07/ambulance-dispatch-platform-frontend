@@ -3,12 +3,19 @@ import {
   getAllMyPayments,
   getPaymentByTripId,
   initiatePayment,
+  retryPayment,
   type PaymentQueryParams,
 } from "@/api/payment.api";
 
 export function useInitiatePayment() {
   return useMutation({
     mutationFn: initiatePayment,
+  });
+}
+
+export function useRetryPayment() {
+  return useMutation({
+    mutationFn: retryPayment,
   });
 }
 
