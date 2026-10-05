@@ -45,3 +45,31 @@ export interface DispatcherDashboardAnalytics {
     dispatchableDrivers: number;
   };
 }
+
+export interface DriverDashboardAnalytics {
+  trips: {
+    total: number;
+    completed: number;
+    cancelled: number;
+    inProgress: number;
+  };
+  dispatches: {
+    total: number;
+    pending: number;
+    accepted: number;
+    completed: number;
+    rejected: number;
+  };
+  earnings: {
+    total: number;
+    thisMonth: number;
+    lastMonth: number;
+    pending: number;
+  };
+  performance: {
+    rating: number;
+    totalRatings: number;
+    acceptanceRate: number;
+    completionRate: number;
+  };
+}
