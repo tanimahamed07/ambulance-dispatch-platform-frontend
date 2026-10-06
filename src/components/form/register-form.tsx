@@ -301,13 +301,11 @@ export default function RegisterForm() {
       </div>
 
       {/* Google Login */}
-      <div className="flex justify-center">
-        <GoogleLoginComponent
-          onSuccess={() => {
-            router.push("/");
-          }}
-        />
-      </div>
+      <GoogleLoginComponent
+        onSuccess={() => {
+          router.push("/");
+        }}
+      />
     </form>
   );
 }

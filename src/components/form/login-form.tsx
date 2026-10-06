@@ -255,9 +255,7 @@ export default function LoginForm() {
       </div>
 
       {/* Google Login */}
-      <div className="flex justify-center">
-        <GoogleLoginComponent />
-      </div>
+      <GoogleLoginComponent />
 
       {/* Demo Credentials Quick Fill Section */}
       <div className="space-y-3 pt-2">
