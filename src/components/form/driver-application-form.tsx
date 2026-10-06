@@ -65,7 +65,7 @@ export default function DriverApplicationForm() {
     },
     onSubmit: async ({ value }) => {
       // Just UI representation (No API fetch)
-      console.log("Form Submitted Values:", value);
+      // console.log("Form Submitted Values:", value);
     },
   });
 

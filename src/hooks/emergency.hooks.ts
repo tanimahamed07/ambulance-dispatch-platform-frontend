@@ -14,8 +14,16 @@ import {
 } from "@tanstack/react-query";
 
 export function useAmbulanceRequest() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ambulanceRequest,
+    onSuccess: () => {
+      // Invalidate all related queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["my-emergencies"] });
+      queryClient.invalidateQueries({ queryKey: ["emergencies"] });
+      queryClient.invalidateQueries({ queryKey: ["caller-dashboard"] });
+    },
   });
 }
 

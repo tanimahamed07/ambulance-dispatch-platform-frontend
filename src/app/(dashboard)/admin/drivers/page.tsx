@@ -64,7 +64,12 @@ export default function AdminDriversPage() {
 
   const { data: response, isLoading, error } = useGetAllDrivers(params);
 
+  console.log("🚀 Drivers Response:", response);
+
+  
   const drivers = response?.data?.data ?? [];
+
+  console.log(drivers)
   const meta = response?.data?.meta;
 
   const handleAvailabilityChange = (value: string | null) => {

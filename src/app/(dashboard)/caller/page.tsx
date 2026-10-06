@@ -27,6 +27,8 @@ export default function CallerPage() {
   } = useQuery({
     queryKey: ["caller-dashboard"],
     queryFn: getCallerDashboard,
+    staleTime: 0, // Data immediately becomes stale, forces refetch on mount
+    refetchOnMount: "always", // Always refetch when component mounts
   });
 
   const stats = analytics?.data;
@@ -73,7 +75,7 @@ export default function CallerPage() {
       {/* Quick Actions */}
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
-          href="/caller/emergencies"
+          href="/caller/request"
           className="group relative overflow-hidden rounded-lg border border-border bg-card p-6 transition-all hover:border-destructive/50 hover:shadow-md"
         >
           <div className="flex items-start gap-4">

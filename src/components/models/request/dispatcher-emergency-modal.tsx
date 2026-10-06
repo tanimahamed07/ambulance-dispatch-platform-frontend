@@ -140,6 +140,8 @@ export function DispatcherEmergencyModal({
       limit: 100,
     });
 
+  console.log("driversData =====>", driversData);
+
   const { mutate: createDispatchMutation } = useCreateDispatch();
 
   const emergency = data?.data;
@@ -148,10 +150,10 @@ export function DispatcherEmergencyModal({
 
   const canAssignDriver = emergency?.status === "PENDING" && !dispatch;
 
-  const availableDrivers: DispatchableDriver[] = Array.isArray(
-    driversData?.data,
-  )
-    ? driversData.data
+  const availableDrivers: DispatchableDriver[] = driversData?.data?.data
+    ? Array.isArray(driversData.data.data)
+      ? driversData.data.data
+      : []
     : [];
   const selectedDriver = availableDrivers.find(
     (d) => d.id === selectedDriverId,
@@ -338,7 +340,7 @@ export function DispatcherEmergencyModal({
                             </Label>
 
                             <Select
-                              value={selectedDriverId || null}
+                              value={selectedDriverId || undefined}
                               onValueChange={(value) =>
                                 setSelectedDriverId(value ?? "")
                               }
@@ -347,23 +349,17 @@ export function DispatcherEmergencyModal({
                                 id="driverSelect"
                                 className="h-auto min-h-12 w-full py-2"
                               >
-                                <SelectValue>
-                                  {() =>
-                                    selectedDriver ? (
-                                      <DriverOption driver={selectedDriver} />
-                                    ) : (
-                                      <span className="text-muted-foreground">
-                                        Choose a driver from the list
-                                      </span>
-                                    )
-                                  }
+                                <SelectValue placeholder="Choose a driver from the list">
+                                  {selectedDriver ? (
+                                    <DriverOption driver={selectedDriver} />
+                                  ) : null}
                                 </SelectValue>
                               </SelectTrigger>
 
                               <SelectContent
                                 alignItemWithTrigger={false}
                                 sideOffset={6}
-                                className="max-h-72 w-(--anchor-width)"
+                                className="max-h-72 w-[var(--radix-select-trigger-width)]"
                               >
                                 {availableDrivers.map((driver) => (
                                   <SelectItem

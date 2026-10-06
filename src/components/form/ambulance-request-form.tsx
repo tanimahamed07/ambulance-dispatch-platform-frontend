@@ -116,7 +116,8 @@ export default function AmbulanceRequestForm() {
             type: "success",
           });
 
-          router.push("/caller");
+          // Redirect to my-emergencies page to see the new request
+          router.push("/caller/my-emergencies");
         },
 
         onError: (error) => {

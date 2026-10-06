@@ -221,22 +221,21 @@ export default function DriverDetailsModal({
             </Section>
 
             {/* Rejection Info (if applicable) */}
-            {driver.approvalStatus === "REJECTED" &&
-              driver.rejectionReason && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                  <p className="text-sm font-medium text-red-900">
-                    Rejection Reason
+            {driver.approvalStatus === "REJECTED" && driver.rejectionReason && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                <p className="text-sm font-medium text-red-900">
+                  Rejection Reason
+                </p>
+                <p className="text-sm text-red-700 mt-1">
+                  {driver.rejectionReason}
+                </p>
+                {driver.rejectionNote && (
+                  <p className="text-xs text-red-600 mt-1">
+                    Note: {driver.rejectionNote}
                   </p>
-                  <p className="text-sm text-red-700 mt-1">
-                    {driver.rejectionReason}
-                  </p>
-                  {driver.rejectionNote && (
-                    <p className="text-xs text-red-600 mt-1">
-                      Note: {driver.rejectionNote}
-                    </p>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
+            )}
           </div>
         )}
       </DialogContent>

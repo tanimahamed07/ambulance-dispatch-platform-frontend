@@ -244,7 +244,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer Navigation */}
       {open && (
-        <div className="border-b border-border bg-background px-6 py-4 lg:hidden">
+        <div className="border-b border-border bg-background px-4 py-4 lg:hidden">
           <nav className="flex flex-col gap-1">
             {LINKS.map((link) => {
               const isActive = pathname === link.href;
@@ -282,7 +282,7 @@ export default function Navbar() {
                 <>
                   <div className="rounded-lg border border-border bg-muted/50 p-3">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
+                      <Avatar className="h-10 w-10 shrink-0">
                         <AvatarImage
                           src={user?.profileUrl || undefined}
                           alt={user?.name || "User"}
@@ -291,23 +291,26 @@ export default function Navbar() {
                           {getInitials(user?.name)}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col">
-                        <p className="text-sm font-medium">{user?.name}</p>
-                        <p className="text-xs text-muted-foreground">
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <p className="truncate text-sm font-medium">
+                          {user?.name}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
                           {user?.email}
                         </p>
                         {roleLabel && (
-                          <p className="text-xs text-muted-foreground">
+                          <p className="truncate text-xs text-muted-foreground">
                             {roleLabel}
                           </p>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     <Button
-                      variant="outline"
+                      variant="default"
                       className="flex-1 gap-2"
+                      size="sm"
                       nativeButton={false}
                       render={
                         <Link
@@ -320,8 +323,9 @@ export default function Navbar() {
                       Dashboard
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="destructive"
                       className="flex-1 gap-2"
+                      size="sm"
                       onClick={handleLogout}
                       disabled={isLoggingOut}
                     >
@@ -331,10 +335,11 @@ export default function Navbar() {
                   </div>
                 </>
               ) : (
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                   <Button
                     variant="outline"
                     className="w-full"
+                    size="sm"
                     nativeButton={false}
                     render={
                       <Link href="/login" onClick={() => setOpen(false)} />
@@ -345,6 +350,7 @@ export default function Navbar() {
 
                   <Button
                     className="w-full"
+                    size="sm"
                     nativeButton={false}
                     render={
                       <Link href="/register" onClick={() => setOpen(false)} />

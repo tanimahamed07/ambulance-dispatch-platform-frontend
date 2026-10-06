@@ -60,7 +60,7 @@ export default function DriverApplicationPage() {
   if (debouncedSearchTerm) params.searchTerm = debouncedSearchTerm;
 
   // Debug: Check what params are being sent
-  console.log("Query Params:", params);
+  // console.log("Query Params:", params);
 
   const {
     data: response,

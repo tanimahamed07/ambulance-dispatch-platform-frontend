@@ -100,7 +100,7 @@ export function getDriverProfile() {
 }
 
 export function getDispatchableDrivers(params: DispatchableDriversQueryParams) {
-  return apiClient<ApiResponse<DispatchableDriver[]>>(
+  return apiClient<ApiResponse<PaginatedResponse<DispatchableDriver>>>(
     "/driver/dispatchable-drivers",
     {
       params,

@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Bell,
-  ChevronDown,
-  LogOut,
-  Menu,
-  Plus,
-  Search,
-  User,
-} from "lucide-react";
+import { Bell, ChevronDown, LogOut, Menu, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -23,7 +15,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/toast";
 import { useLogout } from "@/hooks";
@@ -103,23 +94,7 @@ export function DashboardHeader({
         <Menu className="size-5" />
       </Button>
 
-      {/* Search */}
-      <div className="relative hidden max-w-sm flex-1 md:block">
-        <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Search trips, drivers, bookings…"
-          className="pl-9"
-        />
-      </div>
-
       <div className="ml-auto flex items-center gap-2">
-        {/* Quick action */}
-        <Button size="sm" className="hidden sm:inline-flex">
-          <Plus data-icon="inline-start" />
-          New Dispatch
-        </Button>
-
         <ThemeToggle />
 
         {/* Notifications */}

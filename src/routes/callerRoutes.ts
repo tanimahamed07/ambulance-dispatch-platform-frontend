@@ -4,7 +4,6 @@ import {
   CreditCard,
   LayoutDashboard,
   PhoneCall,
-  Settings,
   User,
 } from "lucide-react";
 import type { SidebarItems } from "@/types";
@@ -34,5 +33,4 @@ export const callerRoutes: SidebarItems = [
     icon: Car,
   },
   { href: `${prefix}/profile`, label: "Profile", icon: User },
-  { href: `${prefix}/settings`, label: "Settings", icon: Settings },
 ];

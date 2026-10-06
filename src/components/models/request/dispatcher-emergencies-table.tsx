@@ -102,8 +102,14 @@ export default function DispatcherEmergenciesTable({
 
             <TableBody>
               {emergencies.map((emergency) => {
-                const statusConfig = STATUS_CONFIG[emergency.status];
-                const priorityConfig = PRIORITY_CONFIG[emergency.priority];
+                const statusConfig = STATUS_CONFIG[emergency.status] || {
+                  label: emergency.status || "Unknown",
+                  variant: "secondary" as const,
+                };
+                const priorityConfig = PRIORITY_CONFIG[emergency.priority] || {
+                  label: emergency.priority || "Unknown",
+                  variant: "secondary" as const,
+                };
 
                 return (
                   <TableRow key={emergency.id}>

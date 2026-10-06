@@ -54,7 +54,7 @@ export default function PaymentHistoryPage() {
   const payments = response?.data ?? [];
   const meta = response?.meta;
 
-  console.log("++++++++>", payments);
+  // console.log("++++++++>", payments);
 
   const handleStatusChange = (value: Payment["status"] | "ALL" | null) => {
     if (value === null) return;

@@ -1,11 +1,4 @@
-import {
-  Ambulance,
-  AlertCircle,
-  LayoutDashboard,
-  Users,
-  User,
-  Settings,
-} from "lucide-react";
+import { AlertCircle, LayoutDashboard, Users, User } from "lucide-react";
 import type { SidebarItems } from "@/types";
 
 const prefix = "/dispatcher";
@@ -19,5 +12,4 @@ export const dispatcherRoutes: SidebarItems = [
   },
   { href: `${prefix}/drivers`, label: "Drivers", icon: Users },
   { href: `${prefix}/profile`, label: "Profile", icon: User },
-  { href: `${prefix}/settings`, label: "Settings", icon: Settings },
 ];
